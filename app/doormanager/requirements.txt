@@ -1,0 +1,7 @@
+certifi
+paho-mqtt
+PyYAML
+RPi.Gpio
+gpiozero
+grpcio
+grpcio-tools

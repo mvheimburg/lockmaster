@@ -1,0 +1,11 @@
+
+
+
+
+class COMMAND_PAYLOAD():
+    LOCK="LOCK"
+    UNLOCK="UNLOCK"
+
+class STATUS_PAYLOAD():
+    LOCKED="LOCKED"
+    UNLOCKED="UNLOCKED"

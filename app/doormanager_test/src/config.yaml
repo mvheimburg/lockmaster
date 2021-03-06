@@ -1,0 +1,11 @@
+setup:
+    qos: 0
+    ssl: False
+
+doors:
+    1:
+        bcd_pin_number: 19
+        command_topic: "door/1/cmd"
+        state_topic: "door/1/state"
+        lock_payload: "LOCK"
+        unlock_payload: "UNLOCK"     

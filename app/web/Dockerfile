@@ -1,0 +1,60 @@
+# FROM balenalib/raspberrypi3-debian:stretch-build as client_builder
+
+# ENV FLUTTER_CHANNEL=stable
+# ENV FLUTTER_VERSION=2.0.1-${FLUTTER_CHANNEL}
+# ENV FLUTTER_TAR=flutter_linux_${FLUTTER_VERSION}.tar.xz
+
+# RUN apt-get update -y
+# RUN apt-get upgrade -y
+
+# RUN install_packages \
+#   curl \
+#   git \
+#   unzip \
+#   wget \
+#   xz-utils \
+#   apt-transport-https \
+#   ca-certificates \
+#   gnupg
+
+
+# RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+
+# WORKDIR /opt
+# RUN wget https://storage.googleapis.com/flutter_infra/releases/stable/linux/${FLUTTER_TAR}
+# RUN tar xf ${FLUTTER_TAR}
+# ENV PATH="/opt/flutter/bin:$PATH"
+
+# VOLUME /app
+# WORKDIR /app
+
+# COPY doorcontrol .
+
+# RUN flutter build web
+
+
+FROM balenalib/raspberrypi3-node:12-run
+
+# use `install_packages` if you need to install dependencies,
+# for instance if you need git, just uncomment the line below.
+# RUN install_packages git
+
+# Defines our working directory in container
+WORKDIR /usr/src/app
+
+# Copies the package.json first for better cache on later pushes
+COPY server/package*.json ./
+
+# This install npm dependencies on the balena build server,
+# making sure to clean up the artifacts it creates in order to reduce the image size.
+RUN JOBS=MAX npm install --production --unsafe-perm && npm cache verify && rm -rf /tmp/*
+
+# This will copy all files in our root to the working directory in the container
+COPY server ./
+COPY doorcontrol/build/web app/
+
+# Enable udevd so that plugged dynamic hardware devices show up in our container.
+# ENV UDEV=1
+
+# server.js will run when container starts up on the device
+# CMD ["npm", "start"]

@@ -1,0 +1,5 @@
+certifi
+paho-mqtt
+PyYAML
+grpcio
+grpcio-tools
