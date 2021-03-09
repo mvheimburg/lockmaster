@@ -1,61 +1,53 @@
 version: '2'
 services:
-
   doorcontrol:
     build:
       context: app/web
       dockerfile: Dockerfile
       args:
-        VIRTUAL_ENV: "/opt/venv"
+        VIRTUAL_ENV: /opt/venv
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
-      DOORMANAGER_GRPC_HOST: doormanager
-      DOORMANAGER_GRPC_PORT: 5000
+      DOORMANAGER_HOST: doormanager
+      PORT: 3000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.doorcontrol.entrypoints=http
+      - traefik.http.routers.doorcontrol.rule=Host(`doorcontrol.localhost`)
     command: npm start
-
-  # anvil_server:
-  #   privileged: true
-  #   build:
-  #     context: app/web
-  #     dockerfile: Dockerfile
-  #     args:
-  #       VIRTUAL_ENV: "/opt/venv"
-  #   # ports:
-  #   # #   # - "3030:3030"
-  #   # #   # - "8080:8080"
-  #   #   - "8443:443/tcp"
-  #   #   - "8080:80/tcp"
-  #   environment:
-  #     DOORMANAGER_GRPC_HOST: doormanager
-  #     DOORMANAGER_GRPC_PORT: 5000
-  #   volumes:
-  #     - 'anvil-data:/anvil-data'
-  #   # command: balena-idle
-  #   # command: anvil-app-server --data-dir /anvil-data --app web
-  #   command: --app web
-  #   networks:
-  #     - backend
-  #     - host
-
   doormanager:
     privileged: true
     build:
       context: app/doormanager
       dockerfile: Dockerfile
       args:
-        VIRTUAL_ENV: "/opt/venv"
+        VIRTUAL_ENV: /opt/venv
+    expose:
+      - 5555
     ports:
-      - '1883:1883'
-      - '5000:5000'
-    environment:
-      DOORMANAGER_GRPC_PORT: 5000
-    command: python3 doormanager/main.py
-
-  # mail:
-  #   image: bytemark/smtp
-  #   ports:
-  #   - '587:587'
-
-# volumes:
-#   anvil-data:
+      - 1883:1883
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.doormanager.entrypoints=http
+      - traefik.http.routers.doormanager.rule=PathPrefix(`/doormanager`)
+      # - traefik.http.routers.doormanager.rule=Host(`doormanager.localhost`)
+      - traefik.http.middlewares.strip-doormanager.stripprefix.prefixes=/doormanager
+      - traefik.http.services.doormanager.loadbalancer.server.port=5555
+      # - traefik.http.routers.doormanager.service=doormanager
+    command: gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+  traefik:
+    image: traefik:latest
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - --api.insecure=true
+      - --entrypoints.web.address=:80
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.endpoint=unix:///var/run/balena.sock
+    ports:
+      - 80:80
+      - 8080:8080
+    labels:
+      - io.balena.features.balena-socket= true

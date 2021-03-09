@@ -7,6 +7,9 @@ var app = require('../app');
 var debug = require('debug')('doorcontrol:server');
 var http = require('http');
 
+// var httpProxy = require('http-proxy');
+// var proxy = httpProxy.createProxyServer({ target: 'http://doormanager:8000', ws: true });
+
 /**
  * Get port from environment and store in Express.
  */
@@ -20,6 +23,14 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+
+// /**
+//  * Proxy REST api to doormanager.
+//  */
+//  app.all("/api/*", function(req, res) {
+//   console.log("proxying GET request", req.url);
+//   proxy.web(req, res, {changeOrigin: true});
+// });
 
 
 /**

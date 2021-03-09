@@ -1,7 +1,11 @@
 certifi
-paho-mqtt
+# paho-mqtt
 PyYAML
 RPi.Gpio
 gpiozero
-grpcio
-grpcio-tools
+fastapi
+fastapi-mqtt
+fastapi-utils
+gunicorn
+uvicorn[standard]
+PyDispatcher

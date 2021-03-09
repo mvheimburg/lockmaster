@@ -1,5 +1,7 @@
 certifi
-paho-mqtt
+# paho-mqtt
 PyYAML
-grpcio
-grpcio-tools
+fastapi
+fastapi-utils
+gunicorn
+uvicorn[standard]

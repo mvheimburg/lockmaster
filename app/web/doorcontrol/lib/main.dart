@@ -1,15 +1,20 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
 
 void main() {
-  runApp(MyApp());
+  runApp(DoorControlApp());
 }
 
-class MyApp extends StatelessWidget {
+class DoorControlApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter DoorControlApp',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -22,7 +27,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'DoorControl HomePage'),
     );
   }
 }
@@ -47,6 +52,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  String res;
+
+  @override
+  void initState() {
+    res = "";
+    super.initState();
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -73,6 +86,37 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: const <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Drawer Header',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.message),
+              title: Text('Messages'),
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Profile'),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+            ),
+          ],
+        ),
+      ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -93,6 +137,11 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextButton.icon(
+                icon: Icon(Icons.camera),
+                label: Text('Take A Photo'),
+                onPressed: () async => _restGet()),
+            res.isNotEmpty ? Text("Server says: $res") : Container(),
             Text(
               'You have pushed the button this many times:',
             ),
@@ -109,5 +158,28 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> _restGet() async {
+    print("prover dingdong");
+
+    try {
+      // var response = await http.get(Uri.http("127.0.0.1:8000", "/"));
+      var response = await http.get(Uri.parse("/doormanager/test"));
+      print('client received with code: ${response.statusCode.toString()}');
+      if (response.statusCode == 200) {
+        setState(() {
+          res = response.body.toString();
+        });
+      } else {
+        setState(() {
+          res = response.statusCode.toString();
+        });
+      }
+    } catch (e) {
+      setState(() {
+        res = e.toString();
+      });
+    }
   }
 }

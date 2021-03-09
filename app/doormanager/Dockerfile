@@ -32,7 +32,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app
 
-COPY src doormanager/
+COPY src/ .
 
 ENV UDEV=1
 
