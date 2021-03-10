@@ -70,8 +70,8 @@ def subscribe(client, mid, qos, properties):
     print("subscribed", client, mid, qos, properties)
 
 
-# @app.on_event("startup")
-# @repeat_every(seconds=5)  
+@app.on_event("startup")
+@repeat_every(seconds=1)  
 async def publish_all():
     # for door in self._config:
         # if self._config[door]["state"] != "Unknown":

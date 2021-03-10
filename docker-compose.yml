@@ -6,15 +6,22 @@ services:
       dockerfile: Dockerfile
       args:
         VIRTUAL_ENV: /opt/venv
-    ports:
-      - 3000:3000
+    # networks:
+    #   - web
+    expose:
+      - 3000
     environment:
       DOORMANAGER_HOST: doormanager
       PORT: 3000
     labels:
       - traefik.enable=true
-      - traefik.http.routers.doorcontrol.entrypoints=http
-      - traefik.http.routers.doorcontrol.rule=Host(`doorcontrol.localhost`)
+      # - traefik.docker.network=web
+      - traefik.http.routers.doorcontrol.entrypoints=web
+      - traefik.http.routers.doorcontrol.rule=PathPrefix(`/`)
+      # - traefik.http.routers.doorcontrol.middlewares=doorcontrol-stripprefix
+      # - traefik.http.middlewares.doorcontrol-stripprefix.stripprefix.prefixes=/doorcontrol
+      - traefik.http.services.doorcontrol.loadbalancer.server.port=3000
+      # - traefik.http.routers.doorcontrol.rule=Host(`lockmaster.local`)
     command: npm start
   doormanager:
     privileged: true
@@ -29,10 +36,11 @@ services:
       - 1883:1883
     labels:
       - traefik.enable=true
-      - traefik.http.routers.doormanager.entrypoints=http
-      - traefik.http.routers.doormanager.rule=PathPrefix(`/doormanager`)
-      # - traefik.http.routers.doormanager.rule=Host(`doormanager.localhost`)
-      - traefik.http.middlewares.strip-doormanager.stripprefix.prefixes=/doormanager
+      - traefik.http.routers.doormanager.entrypoints=web
+      - traefik.http.routers.doormanager.rule=PathPrefix(`/doormanager{regex:$$|/.*}`)
+      # - traefik.http.routers.doormanager.rule=Host(`lockmaster.local`) && PathPrefix(`/doormanager`)
+      - traefik.http.routers.doormanager.middlewares=doormanager-stripprefix
+      - traefik.http.middlewares.doormanager-stripprefix.stripprefix.prefixes=/doormanager
       - traefik.http.services.doormanager.loadbalancer.server.port=5555
       # - traefik.http.routers.doormanager.service=doormanager
     command: gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
@@ -40,14 +48,23 @@ services:
     image: traefik:latest
     container_name: "traefik"
     command:
-      - "--log.level=DEBUG"
+      - --log.level=DEBUG
+      # - --tracing=true
       - --api.insecure=true
       - --entrypoints.web.address=:80
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.endpoint=unix:///var/run/balena.sock
+    # labels:
+    #   - traefik.docker.network=web
+    # networks:
+    #   - web
     ports:
       - 80:80
       - 8080:8080
     labels:
       - io.balena.features.balena-socket= true
+
+# networks:
+#   mqtt:
+#   web:
