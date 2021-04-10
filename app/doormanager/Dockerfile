@@ -1,6 +1,6 @@
 FROM balenalib/raspberrypi3-python:3.8-buster-build as builder
-ARG VIRTUAL_ENV
 
+ARG VIRTUAL_ENV
 
 
 RUN python3 -m venv $VIRTUAL_ENV
@@ -23,11 +23,15 @@ RUN pip3 install --ignore-installed -r requirements.txt
 FROM balenalib/raspberrypi3-python:3.8-buster-run
 
 ARG VIRTUAL_ENV
+ARG DOMAIN
+ARG CERTRESOLVER
 
 LABEL   traefik.enable="true" \
         traefik.http.routers.doormanager.entrypoints="websecure" \
-        traefik.http.routers.doormanager.rule="PathPrefix(`/doormanager{regex:$$|/.*}`)" \
+        traefik.http.routers.doormanager.rule="Host(`doorcontrol.${DOMAIN}`) && PathPrefix(`/doormanager{regex:$$|/.*}`)" \
         traefik.http.routers.doormanager.middlewares="doormanager-stripprefix" \
+        traefik.http.routers.doormanager.tls="true" \
+        traefik.http.routers.doormanager.tls.certresolver=${CERTRESOLVER} \
         traefik.http.middlewares.doormanager-stripprefix.stripprefix.prefixes="/doormanager" \
         traefik.http.services.doormanager.loadbalancer.server.port="5555"
 
