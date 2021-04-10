@@ -7,11 +7,11 @@ from time import sleep
 import urllib.parse
 import gpiozero
 
-from pydispatch import dispatcher
+# from pydispatch import dispatcher
 # import protos.doormanager_pb2_grpc as pb2_grpc
 # import protos.doormanager_pb2 as pb2
 
-SIGNAL = 'my-first-signal'
+# SIGNAL = 'my-first-signal'
 
 from const import(
     COMMAND_PAYLOAD
@@ -60,7 +60,7 @@ class DoorManager():
             else:
                 self._config[door].update({"state": STATUS_PAYLOAD.UNLOCKED})
 
-        dispatcher.send( signal=SIGNAL, sender=self )
+        # dispatcher.send( signal=SIGNAL, sender=self )
 
     # def publish_status(self):
     #     self.update_status()

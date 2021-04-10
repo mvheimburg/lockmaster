@@ -1,28 +1,32 @@
 version: '2'
 services:
+
+  traefik:
+    build:
+      context: traefik
+      dockerfile: Dockerfile
+    volumes:
+      - certs:/var/certs
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+      - 8080:8080/tcp
+    labels:
+      - io.balena.features.balena-socket=true
+
   doorcontrol:
     build:
       context: app/web
       dockerfile: Dockerfile
-      args:
-        VIRTUAL_ENV: /opt/venv
-    # networks:
-    #   - web
     expose:
       - 3000
     environment:
       DOORMANAGER_HOST: doormanager
       PORT: 3000
-    labels:
-      - traefik.enable=true
-      # - traefik.docker.network=web
-      - traefik.http.routers.doorcontrol.entrypoints=web
-      - traefik.http.routers.doorcontrol.rule=PathPrefix(`/`)
-      # - traefik.http.routers.doorcontrol.middlewares=doorcontrol-stripprefix
-      # - traefik.http.middlewares.doorcontrol-stripprefix.stripprefix.prefixes=/doorcontrol
-      - traefik.http.services.doorcontrol.loadbalancer.server.port=3000
-      # - traefik.http.routers.doorcontrol.rule=Host(`lockmaster.local`)
+    env_file:
+      - common.env
     command: npm start
+
   doormanager:
     privileged: true
     build:
@@ -34,37 +38,89 @@ services:
       - 5555
     ports:
       - 1883:1883
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.doormanager.entrypoints=web
-      - traefik.http.routers.doormanager.rule=PathPrefix(`/doormanager{regex:$$|/.*}`)
-      # - traefik.http.routers.doormanager.rule=Host(`lockmaster.local`) && PathPrefix(`/doormanager`)
-      - traefik.http.routers.doormanager.middlewares=doormanager-stripprefix
-      - traefik.http.middlewares.doormanager-stripprefix.stripprefix.prefixes=/doormanager
-      - traefik.http.services.doormanager.loadbalancer.server.port=5555
-      # - traefik.http.routers.doormanager.service=doormanager
     command: gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
-  traefik:
-    image: traefik:latest
-    container_name: "traefik"
-    command:
-      - --log.level=DEBUG
-      # - --tracing=true
-      - --api.insecure=true
-      - --entrypoints.web.address=:80
-      - --providers.docker=true
-      - --providers.docker.exposedbydefault=false
-      - --providers.docker.endpoint=unix:///var/run/balena.sock
-    # labels:
-    #   - traefik.docker.network=web
-    # networks:
-    #   - web
+
+
+  unifi-controller:
+    build:
+      context: unifi
+      dockerfile: Dockerfile
+    environment:
+      PUID: 1000
+      PGID: 1000
+      # - MEM_LIMIT=1024M #optional
+    volumes:
+      - unifi-config:/config
     ports:
-      - 80:80
-      - 8080:8080
-    labels:
-      - io.balena.features.balena-socket= true
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    expose:
+      - 8443
+    # labels:
+    #   traefik.enable: true
+    #   traefik.http.routers.unifi.entrypoints: websecure
+    #   # - traefik.http.routers.unifi.rule: PathPrefix(`/unifi{regex:$$|/.*}`)
+    #   # - traefik.http.routers.unifi.rule:  Host(`unifi.$DOMAIN`) || PathPrefix(`/unifi{regex:$$|/.*}
+    #   traefik.http.routers.unifi.rule:  Host(`unifi.${DOMAIN}`)
+    #   # - traefik.http.routers.unifi.tls: true
+    #   traefik.http.routers.unifi.tls.certresolver: duckdns
+    #   traefik.http.routers.unifi.middlewares: unifi-stripprefix
+    #   traefik.http.middlewares.unifi-stripprefix.stripprefix.prefixes: /unifi
+    #   traefik.http.services.unifi.loadbalancer.server.port: 8443
+
+  # db:
+  #   image: 'postgres:12'
+  #   volumes:
+  #     - 'app-db-data:/var/lib/postgresql/data/pgdata'
+  #   env_file:
+  #     - database/database.env
+  #   environment:
+  #     - PGDATA=/var/lib/postgresql/data/pgdata
+  #   deploy:
+  #     placement:
+  #       constraints:
+  #         - 'node.labels.${STACK_NAME?Variable not set}.app-db-data == true'
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   depends_on:
+  #     - db
+  #   env_file:
+  #     - database/database.env
+  #   deploy:
+  #     labels:
+  #       - traefik.enable=true
+  #       - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-http.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-http.entrypoints=http
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-http.middlewares=${STACK_NAME?Variable not set}-https-redirect
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.entrypoints=https
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.tls=true
+  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.tls.certresolver=le
+  #       - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
+ 
+ 
+ 
+ 
+  # mqtt:
+  #   image: panuwitp/mosquitto-arm
+  #   ports:
+  #     - "1883:1883"
 
 # networks:
 #   mqtt:
 #   web:
+
+volumes:
+  certs:
+  unifi-config: 
+  app-db-data:
+
+# networks:
+#   traefik-public:
+#     external: '${TRAEFIK_PUBLIC_NETWORK_IS_EXTERNAL-false}'

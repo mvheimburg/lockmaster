@@ -39,6 +39,16 @@ FROM balenalib/raspberrypi3-node:12-run
 # for instance if you need git, just uncomment the line below.
 # RUN install_packages git
 
+ARG DOMAIN
+ARG CERTRESOLVER
+
+LABEL   traefik.enable="true" \
+        traefik.http.routers.doorcontrol.entrypoints="websecure" \
+        traefik.http.routers.doorcontrol.rule="Host(`doorcontrol.${DOMAIN}`)" \
+        traefik.http.routers.doorcontrol.tls="true" \
+        traefik.http.routers.doorcontrol.tls.certresolver=${CERTRESOLVER} \
+        traefik.http.services.doorcontrol.loadbalancer.server.port="3000"
+
 # Defines our working directory in container
 WORKDIR /usr/src/app
 

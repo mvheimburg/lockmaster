@@ -7,9 +7,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_mqtt import FastMQTT, MQTTConfig
 from fastapi_utils.tasks import repeat_every
-from pydispatch import dispatcher
+# from pydispatch import dispatcher
 
-SIGNAL = 'my-first-signal'
+# SIGNAL = 'my-first-signal'
 
 app = FastAPI()
 app.add_middleware(
@@ -86,11 +86,18 @@ async def publish_all():
 
 
 
-def handle_event( sender ):
-    """Simple event handler"""
-    print('Signal was sent by', sender)
+# def handle_event( sender ):
+#     """Simple event handler"""
+#     print('Signal was sent by', sender)
 
-dispatcher.connect( handle_event, signal=SIGNAL, sender=dispatcher.Any )
+# dispatcher.connect( handle_event, signal=SIGNAL, sender=dispatcher.Any )
+
+
+
+@app.get("/test")
+async def root():
+    print('ROOT Called')
+    return {"message": "Hello World"}
 
 
 

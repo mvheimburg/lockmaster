@@ -1,0 +1,30 @@
+# to enable this proxy service set the following environment variables
+# either via docker-compose.yml or the Balena Application Dashboard
+#
+#  [HOMEASSISTANT_HOST]
+#   public domain or subdomain with dns A records pointing to your server or firewall
+#   example: homeassistant.example.com
+#
+#  [HOMEASSISTANT_SERVER]
+#   internal http server url to receive proxied traffic
+#   example: http://192.168.8.6:8123
+#
+[http]
+
+[http.routers]
+[http.routers.to-homeassistant]
+rule = "Host(`ha.$DOMAIN`)"
+service = "homeassistant"
+middlewares = ["hsts-header"]
+
+# middlewares = ["hsts-header", "ip-allowlist"]
+[http.routers.to-homeassistant.tls]
+certresolver = "$CERTRESOLVER"
+
+[http.services]
+[http.services.homeassistant.loadBalancer]
+[[http.services.homeassistant.loadBalancer.servers]]
+url = "$HOMEASSISTANT_SERVER"
+
+
+

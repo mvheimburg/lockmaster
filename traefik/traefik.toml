@@ -1,0 +1,59 @@
+[global]
+checkNewVersion = false
+sendAnonymousUsage = false
+
+[log]
+level = "INFO"
+
+[api]
+insecure = true
+
+[accessLog]
+
+[entryPoints]
+[entryPoints.web]
+address = ":80"
+
+[entryPoints.web.forwardedHeaders]
+trustedIPs = ["$HOMEASSISTANT_IP"]
+
+[entryPoints.web.http]
+[entryPoints.web.http.redirections]
+[entryPoints.web.http.redirections.entryPoint]
+to = "websecure"
+scheme = "https"
+
+[entryPoints.websecure]
+address = ":443"
+# [entryPoints.websecure.http.tls]
+# certResolver = "leresolver"
+#     [[entryPoints.websecure.http.tls.domains]]
+#     main = "lvh.duckdns.org"
+#     sans = ["doorcontrol.lvh.duckdns.org"]
+
+# [certificatesResolvers.staging.acme]
+# email = "$ACME_EMAIL"
+# storage = "/var/certs/acme-staging.json"
+# caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+#     [certificatesResolvers.duckdns.acme.dnsChallenge]
+#     provider = "duckdns"
+#     delayBeforeCheck = 0
+
+[certificatesResolvers.duckdns.acme]
+email = "$ACME_EMAIL"
+storage = "/var/certs/acme.json"
+caServer = "https://acme-v02.api.letsencrypt.org/directory"
+
+[certificatesResolvers.duckdns.acme.dnsChallenge]
+provider = "duckdns"
+delayBeforeCheck = 0
+
+[providers.file]
+directory = "/etc/traefik/conf.d"
+watch = true
+
+[providers.docker]
+endpoint = "unix:///var/run/balena.sock"
+exposedByDefault = false
+defaultRule = "Host(`$LOCKMASTER_HOST`)"
