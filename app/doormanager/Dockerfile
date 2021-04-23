@@ -28,6 +28,7 @@ ARG CERTRESOLVER
 
 LABEL   traefik.enable="true" \
         traefik.http.routers.doormanager.entrypoints="websecure" \
+        # traefik.http.routers.doormanager.rule="PathPrefix(`/doormanager{regex:$$|/.*}`) || Host(`doorcontrol.${DOMAIN}`) && PathPrefix(`/doormanager{regex:$$|/.*}`)" \
         traefik.http.routers.doormanager.rule="Host(`doorcontrol.${DOMAIN}`) && PathPrefix(`/doormanager{regex:$$|/.*}`)" \
         traefik.http.routers.doormanager.middlewares="doormanager-stripprefix" \
         traefik.http.routers.doormanager.tls="true" \
@@ -36,24 +37,33 @@ LABEL   traefik.enable="true" \
         traefik.http.services.doormanager.loadbalancer.server.port="5555"
 
 
+ARG POSTGRES_SERVER
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
+ARG POSTGRES_DB
+
+ENV POSTGRES_SERVER=$POSTGRES_SERVER
+ENV POSTGRES_USER=$POSTGRES_USER
+ENV POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+ENV POSTGRES_DB=$POSTGRES_DB
+
 
 COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 
 
-# RUN : \
-#     && apt update \
-#     && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
-#     rpi.gpio \
-#     python3-gpiozero \
-#     && apt-get clean \
-#         && rm -rf /var/lib/apt/lists/* \
-#         && :
+RUN : \
+    && apt update \
+    && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    libpq5 \
+    && apt-get clean \
+        && rm -rf /var/lib/apt/lists/* \
+        && :
 
 WORKDIR /app
 
 COPY src/ .
 
-ENV UDEV=1
+# ENV UDEV=1
 

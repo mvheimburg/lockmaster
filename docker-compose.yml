@@ -38,9 +38,8 @@ services:
       - 5555
     ports:
       - 1883:1883
-    command: gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
-
-
+    command: gunicorn main:create_app() -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+    
   unifi-controller:
     build:
       context: unifi
@@ -73,39 +72,21 @@ services:
     #   traefik.http.middlewares.unifi-stripprefix.stripprefix.prefixes: /unifi
     #   traefik.http.services.unifi.loadbalancer.server.port: 8443
 
-  # db:
-  #   image: 'postgres:12'
-  #   volumes:
-  #     - 'app-db-data:/var/lib/postgresql/data/pgdata'
-  #   env_file:
-  #     - database/database.env
-  #   environment:
-  #     - PGDATA=/var/lib/postgresql/data/pgdata
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - 'node.labels.${STACK_NAME?Variable not set}.app-db-data == true'
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   depends_on:
-  #     - db
-  #   env_file:
-  #     - database/database.env
-  #   deploy:
-  #     labels:
-  #       - traefik.enable=true
-  #       - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK?Variable not set}
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-http.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-http.entrypoints=http
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-http.middlewares=${STACK_NAME?Variable not set}-https-redirect
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.rule=Host(`pgadmin.${DOMAIN?Variable not set}`)
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.entrypoints=https
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.tls=true
-  #       - traefik.http.routers.${STACK_NAME?Variable not set}-pgadmin-https.tls.certresolver=le
-  #       - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
- 
- 
- 
+  db:
+    build:
+      context: db
+      dockerfile: Dockerfile.db
+    volumes:
+      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+    # env_file:
+    #   - postgresql/database.env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - 'node.labels.${STACK_NAME?Variable not set}.app-db-data == true'
+  
  
   # mqtt:
   #   image: panuwitp/mosquitto-arm

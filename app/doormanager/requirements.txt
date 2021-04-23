@@ -1,5 +1,5 @@
 certifi
-# paho-mqtt
+paho-mqtt
 PyYAML
 RPi.Gpio
 gpiozero
@@ -8,4 +8,12 @@ fastapi-mqtt
 fastapi-utils
 gunicorn
 uvicorn[standard]
-PyDispatcher
+# PyDispatcher
+pydantic
+# psycopg2
+psycopg2-binary
+# fastapi-sqlalchemy
+sqlalchemy
+# databases[postgresql]
+python-box
+dependency-injector

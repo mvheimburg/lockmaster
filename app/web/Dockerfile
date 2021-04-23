@@ -44,6 +44,7 @@ ARG CERTRESOLVER
 
 LABEL   traefik.enable="true" \
         traefik.http.routers.doorcontrol.entrypoints="websecure" \
+        # traefik.http.routers.doorcontrol.rule="PathPrefix(`/`) || Host(`doorcontrol.${DOMAIN}`)" \
         traefik.http.routers.doorcontrol.rule="Host(`doorcontrol.${DOMAIN}`)" \
         traefik.http.routers.doorcontrol.tls="true" \
         traefik.http.routers.doorcontrol.tls.certresolver=${CERTRESOLVER} \
