@@ -10,7 +10,7 @@ import logging
 
 import paho.mqtt.client as mqtt
 
-from door import Door
+# from door import Door
 
 from const import(
     COMMAND_PAYLOAD
@@ -18,14 +18,25 @@ from const import(
 )
 
 
+build_type = environ.get('BUILD_TYPE', None)
+print(f"build_type: {build_type}")
+if build_type == 'staging':
+    from door import Door
+else:
+    from door import DoorDummy as Door
+            
+
+
 logger = logging.getLogger(__name__)
 
 
 class Doormanager:
 
+    doors = []
+
     def __init__(self, doors_cfg: dict) -> None:
         print(f"doors_cfg: {doors_cfg}")
-        self.doors = []
+
         for door, cfg in  doors_cfg.items():
             print(f"new_door: {door}")
             new_door = Door(name=door, command_topic=cfg['command_topic'], state_topic=cfg['state_topic'], pin=cfg['pin'])
@@ -62,22 +73,3 @@ class Doormanager:
                     door.unlock()
 
         self.publish_status(mqttc)
-
-    # def publish_status(self):
-    #     for door in self.doors:
-    #         if door.state != "Unknown":
-    #             self.mqtt.publish(door.state_topic, payload=door.state)
-
-
-
-    # @contextmanager
-    # def session(self) -> Callable[..., AbstractContextManager[Session]]:
-    #     session: Session = self._session_factory()
-    #     try:
-    #         yield session
-    #     except Exception:
-    #         logger.exception('Session rollback because of exception')
-    #         session.rollback()
-    #         raise
-    #     finally:
-    #         session.close()

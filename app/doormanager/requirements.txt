@@ -14,6 +14,8 @@ pydantic
 psycopg2-binary
 # fastapi-sqlalchemy
 sqlalchemy
+sqlalchemy-utils
 # databases[postgresql]
 python-box
 dependency-injector
+pydantic_sqlalchemy

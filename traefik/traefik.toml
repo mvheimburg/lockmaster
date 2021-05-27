@@ -17,11 +17,11 @@ address = ":80"
 [entryPoints.web.forwardedHeaders]
 trustedIPs = ["$HOMEASSISTANT_IP"]
 
-[entryPoints.web.http]
-[entryPoints.web.http.redirections]
-[entryPoints.web.http.redirections.entryPoint]
-to = "websecure"
-scheme = "https"
+# [entryPoints.web.http]
+# [entryPoints.web.http.redirections]
+# [entryPoints.web.http.redirections.entryPoint]
+# to = "websecure"
+# scheme = "https"
 
 [entryPoints.websecure]
 address = ":443"
@@ -56,4 +56,10 @@ watch = true
 [providers.docker]
 endpoint = "unix:///var/run/balena.sock"
 exposedByDefault = false
-defaultRule = "Host(`$LOCKMASTER_HOST`)"
+# defaultRule = "Host(`$LOCKMASTER_HOST`)"
+
+[pilot]
+token = "effb8cb0-d258-47ff-adcc-1b4c907b3d42"
+
+[http.serversTransports.mytransport]
+insecureSkipVerify = true

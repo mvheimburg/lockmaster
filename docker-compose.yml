@@ -10,21 +10,31 @@ services:
     ports:
       - 80:80/tcp
       - 443:443/tcp
-      - 8080:8080/tcp
+      - 8081:8080/tcp
     labels:
       - io.balena.features.balena-socket=true
 
   doorcontrol:
     build:
       context: app/web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.doorcontrol
     expose:
       - 3000
     environment:
       DOORMANAGER_HOST: doormanager
       PORT: 3000
-    env_file:
-      - common.env
+    command: npm start
+
+  
+  doormonitor:
+    build:
+      context: app/web
+      dockerfile: Dockerfile.doormonitor
+    expose:
+      - 3000
+    environment:
+      DOORMANAGER_HOST: doormanager
+      PORT: 3000
     command: npm start
 
   doormanager:
@@ -38,7 +48,10 @@ services:
       - 5555
     ports:
       - 1883:1883
-    command: gunicorn main:create_app() -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+    depends_on: 
+      - lock_db
+    # command: gunicorn main:create_app() -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+    command: gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
     
   unifi-controller:
     build:
@@ -54,12 +67,14 @@ services:
       - 3478:3478/udp
       - 10001:10001/udp
       - 1900:1900/udp #optional
+      - 8080:8080
       - 8843:8843 #optional
+      - 8443:8443 #optional
       - 8880:8880 #optional
       - 6789:6789 #optional
       - 5514:5514/udp #optional
-    expose:
-      - 8443
+    # expose:
+    #   - 8443
     # labels:
     #   traefik.enable: true
     #   traefik.http.routers.unifi.entrypoints: websecure
@@ -72,7 +87,7 @@ services:
     #   traefik.http.middlewares.unifi-stripprefix.stripprefix.prefixes: /unifi
     #   traefik.http.services.unifi.loadbalancer.server.port: 8443
 
-  db:
+  lock_db:
     build:
       context: db
       dockerfile: Dockerfile.db

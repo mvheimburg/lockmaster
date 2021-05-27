@@ -18,4 +18,5 @@ LABEL   traefik.enable="true" \
         # traefik.http.routers.db.rule="PathPrefix(`/db{regex:$$|/.*}`) || Host(`doorcontrol.${DOMAIN}`) && PathPrefix(`/db{regex:$$|/.*}`)" \
         traefik.http.routers.db.rule="Host(`doorcontrol.${DOMAIN}`) && PathPrefix(`/db{regex:$$|/.*}`)" \
         traefik.http.routers.db.tls="true" \
-        traefik.http.routers.db.tls.certresolver=${CERTRESOLVER}
+        traefik.http.routers.db.tls.certresolver=${CERTRESOLVER} 
+        # traefik.http.services.db.loadbalancer.server.port="5432"

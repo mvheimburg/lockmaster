@@ -1,0 +1,50 @@
+version: '2'
+services:
+  doorcontrol:
+    build:
+      context: app/web
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    environment:
+      DOORMANAGER_HOST: doormanager
+      PORT: 3000
+    env_file:
+      - dev.env
+    command: npm start
+
+  doormanager:
+    privileged: true
+    build:
+      context: app/doormanager
+      dockerfile: Dockerfile.dev
+      args:
+        VIRTUAL_ENV: /opt/venv
+    ports:
+      - '5555:5555'
+      # - '8000:8000'
+    env_file:
+      - dev.env
+    depends_on:
+      - lock_db
+    volumes:
+      - '.:/workspace:cached'
+    command: sleep infinity
+  lock_db:
+    build:
+      context: db
+      dockerfile: Dockerfile.db.dev
+    volumes:
+      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+    env_file:
+      - dev.env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+  database-admin:
+    image: dpage/pgadmin4
+    env_file:
+      - dev.env
+    ports:
+      - '5051:80'
+volumes:
+  app-db-data: null

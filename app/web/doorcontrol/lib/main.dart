@@ -1,185 +1,194 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
+import 'dart:async';
+
+import 'package:google_fonts/google_fonts.dart';
+import "package:velocity_x/velocity_x.dart";
+
+import 'package:doorcontrol/adddatawidget.dart';
+import 'package:doorcontrol/models/rest.dart';
+import 'package:doorcontrol/services/api_service.dart';
+import 'package:doorcontrol/screens/userlistscreen.dart';
+import 'package:doorcontrol/screens/userdetailsscreen.dart';
+import 'package:doorcontrol/screens/adduserscreen.dart';
+
+import 'package:doorcontrol/routes.dart';
 
 void main() {
-  runApp(DoorControlApp());
+  // runApp(VxState(store: DoorcontrolStore(), child: DoorcontrolApp()));
+
+  runApp(DoorcontrolApp());
 }
 
-class DoorControlApp extends StatelessWidget {
-  // This widget is the root of your application.
+// class DoorcontrolStore extends VxStore {
+//   final ApiService api = ApiService();
+//   User? _selectedUser;
+//   List<User> users = [];
+// }
+
+class DoorcontrolApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _DoorcontrolAppState();
+}
+
+class _DoorcontrolAppState extends State<DoorcontrolApp> {
+  final ApiService api = ApiService();
+  List<User> users = [];
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter DoorControlApp',
+    return MaterialApp.router(
+      title: 'VelocityX',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
+        textTheme: GoogleFonts.latoTextTheme(),
+        appBarTheme: AppBarTheme(
+            color: Vx.white,
+            textTheme: GoogleFonts.latoTextTheme().apply(
+              bodyColor: Vx.black,
+            ),
+            iconTheme: IconThemeData(color: Colors.black)),
       ),
-      home: MyHomePage(title: 'DoorControl HomePage'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  String res;
-
-  @override
-  void initState() {
-    res = "";
-    super.initState();
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: const <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Drawer Header',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+      routeInformationParser: VxInformationParser(),
+      routerDelegate: VxNavigator(
+          notFoundPage: (uri, params) => MaterialPage(
+                key: ValueKey('not-found-page'),
+                child: Builder(
+                  builder: (context) => Scaffold(
+                    body: Center(
+                      child: Text('Page ${uri.path} not found'),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.message),
-              title: Text('Messages'),
-            ),
-            ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text('Profile'),
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-            ),
-          ],
-        ),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextButton.icon(
-                icon: Icon(Icons.camera),
-                label: Text('Take A Photo'),
-                onPressed: () async => _restGet()),
-            res.isNotEmpty ? Text("Server says: $res") : Container(),
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+          routes: {
+            Routes.home: (uri, __) => MaterialPage(child: UsersListScreen()),
+            Routes.adduser: (uri, __) => MaterialPage(child: AddUserScreen()),
+            Routes.userdetails: (uri, __) {
+              final String? user_id = uri.queryParameters["id"];
+              return MaterialPage(child: UserDetailsScreen(user_id));
+            }
+          }),
     );
   }
 
-  Future<void> _restGet() async {
-    print("prover dingdong");
-
-    try {
-      // var response = await http.get(Uri.http("127.0.0.1:8000", "/"));
-      var response = await http.get(Uri.parse("/doormanager/test"));
-      print('client received with code: ${response.statusCode.toString()}');
-      if (response.statusCode == 200) {
-        setState(() {
-          res = response.body.toString();
-        });
-      } else {
-        setState(() {
-          res = response.statusCode.toString();
-        });
-      }
-    } catch (e) {
+  void loadList() {
+    Future<List<User>> futureUsers = api.getUsers();
+    futureUsers.then((usersList) {
       setState(() {
-        res = e.toString();
+        this.users = usersList;
       });
-    }
+    });
+    // return futureUsers;
   }
+
+  // void _handleUserTapped(User user) {
+  //   setState(() {
+  //     _selectedUser = user;
+  //   });
+  // }
 }
+
+//       title: 'Doorcontrol App',
+//       home: Navigator(
+//           pages: [
+//             MaterialPage(
+//               key: ValueKey('UsersListPage'),
+//               child: UsersListScreen(
+//                 users: users,
+//                 onTapped: _handleUserTapped,
+//               ),
+//             ),
+//             // if (_selectedUser != null) UserDetailsPage(user: _selectedUser)
+//           ],
+//           onPopPage: (route, result) {
+//             if (!route.didPop(result)) {
+//               return false;
+//             }
+
+//             // Update the list of pages by setting _selectedBook to null
+//             loadList();
+//             setState(() {
+//               _selectedUser = null;
+//             });
+
+//             return true;
+//           }),
+//     );
+//   }
+
+//   void loadList() {
+//     Future<List<User>> futureUsers = api.getUsers();
+//     futureUsers.then((usersList) {
+//       setState(() {
+//         users = usersList;
+//       });
+//     });
+//     // return futureUsers;
+//   }
+
+//   void _handleUserTapped(User user) {
+//     setState(() {
+//       _selectedUser = user;
+//     });
+//   }
+// }
+
+// class _MyHomePageState extends State<MyHomePage> {
+//   final ApiService api = ApiService();
+//   List<User> usersList = [];
+
+//   @override
+//   Widget build(BuildContext context) {
+//     // This method is rerun every time setState is called, for instance as done
+//     // by the _incrementCounter method above.
+//     //
+//     // The Flutter framework has been optimized to make rerunning build methods
+//     // fast, so that you can just rebuild anything that needs updating rather
+//     // than having to individually change instances of widgets.
+//     return Scaffold(
+//       appBar: AppBar(
+//         // Here we take the value from the MyHomePage object that was created by
+//         // the App.build method, and use it to set our appbar title.
+//         title: Text(widget.title),
+//       ),
+//       body: new Container(
+//         child: new Center(
+//             child: new FutureBuilder(
+//           future: loadList(),
+//           builder: (context, snapshot) {
+//             return usersList.length > 0
+//                 ? new UserList(users: usersList)
+//                 : new Center(
+//                     child: new Text('No data found, tap plus button to add!',
+//                         style: Theme.of(context).textTheme.title));
+//           },
+//         )),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         onPressed: () {
+//           _navigateToAddScreen(context);
+//         },
+//         tooltip: 'Increment',
+//         child: Icon(Icons.add),
+//       ), // This trailing comma makes auto-formatting nicer for build methods.
+//     );
+//   }
+
+//   Future loadList() {
+//     Future<List<User>> futureUsers = api.getUsers();
+//     futureUsers.then((usersList) {
+//       setState(() {
+//         this.usersList = usersList;
+//       });
+//     });
+//     return futureUsers;
+//   }
+
+//   _navigateToAddScreen(BuildContext context) async {
+//     final result = await Navigator.push(
+//       context,
+//       MaterialPageRoute(builder: (context) => AddDataWidget()),
+//     );
+//   }
+// }

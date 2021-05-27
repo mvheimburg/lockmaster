@@ -8,6 +8,7 @@ from os import environ
 from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
+from sqlalchemy_utils import database_exists, create_database, drop_database
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +22,11 @@ class Database():
         dbusername = environ.get('POSTGRES_USER', None)
         dbpass = environ.get('POSTGRES_PASSWORD', None)
         dbname = environ.get('POSTGRES_DB', None)
+        dbserver = environ.get('POSTGRES_SERVER', None)
 
-        DATABASE_URI = 'postgresql://'+dbusername+':'+dbpass+'@'+'db'+'/'+dbname
+        self.DATABASE_URI = 'postgresql://'+dbusername+':'+dbpass+'@'+dbserver+'/'+dbname
 
-        self._engine = create_engine(DATABASE_URI, echo=True)
+        self._engine = create_engine(self.DATABASE_URI, echo=True)
         self._session_factory = orm.scoped_session(
             orm.sessionmaker(
                 autocommit=False,
@@ -33,9 +35,16 @@ class Database():
             ),
         )
 
-    def create_database(self) -> None:
-        Base.metadata.create_all(self._engine)
 
+
+    def create_database(self) -> None:
+        if not database_exists(self.DATABASE_URI):
+            create_database(self.DATABASE_URI)
+            Base.metadata.create_all(self._engine)
+
+    def delete_db(self) -> None:
+        if database_exists(self.DATABASE_URI):
+            drop_database(self.DATABASE_URI)
 
     @contextmanager
     # def session(self) -> Callable[..., AbstractContextManager[Session]]:

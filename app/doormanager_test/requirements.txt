@@ -1,7 +1,0 @@
-certifi
-# paho-mqtt
-PyYAML
-fastapi
-fastapi-utils
-gunicorn
-uvicorn[standard]

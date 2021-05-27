@@ -6,7 +6,8 @@ from doormanager import Doormanager
 # from mqttlayer import MqttLayer
 from database import Database
 from repositories import UserRepository
-from services import UserService
+from services import UserService, AccessService
+# from services import UserService
 
 
 class Container(containers.DeclarativeContainer):
@@ -27,5 +28,10 @@ class Container(containers.DeclarativeContainer):
 
     user_service = providers.Factory(
         UserService,
+        user_repository=user_repository,
+    )
+
+    access_service = providers.Singleton(
+        AccessService,
         user_repository=user_repository,
     )
