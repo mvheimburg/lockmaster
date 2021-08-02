@@ -4,6 +4,7 @@
 .dart_tool/
 .packages
 build/
+.balena/
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 
@@ -19,3 +20,7 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+/.balena
+/.vscode
+api_secrets.json
+mqtt_secrets.json
