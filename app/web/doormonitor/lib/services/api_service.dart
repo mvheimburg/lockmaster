@@ -32,7 +32,8 @@ import 'package:http/http.dart' as http;
 class ApiService {
   // final String apiUrl = "/doormanager";
   // final String apiParamsPath = "api_secrets.json";
-  late final String apiUrl = "http://192.168.1.100/doormanager";
+  // late final String apiUrl = "http://192.168.1.100/doormanager";
+  late final String apiUrl = "/doormanager";
   // late Future<ApiParams> apiParams;
   //
   // ApiService._(this.buildType, this.apiUrl);
@@ -64,6 +65,22 @@ class ApiService {
     }
   }
 
+  Future<int> getAccessLevelByPin(String pin) async {
+    //  Map data = {
+    //   'pin': pin,
+    // };
+
+    final http.Response response =
+        await http.get(Uri.parse("$apiUrl/get_access_level_by_pin/$pin"));
+
+    if (response.statusCode == 200) {
+      int access = json.decode(response.body);
+      return access;
+    } else {
+      throw "Failed to load Access";
+    }
+  }
+
   // Future<int> getAccessLevel() async {
   //   apiParams.then((ApiParams params) async {
   //     print('ringing bell at: ${params.apiAddress}');
@@ -79,16 +96,17 @@ class ApiService {
   //   }, onError: throw "Api address not loaded");
   // }
 
-  // Future<int> ringDoorbell() async {
-  //   http.Response response = await http
-  //       .post(Uri.parse("$apiUrl/ring_doorbell"), headers: <String, String>{
-  //     'Content-Type': 'application/json; charset=UTF-8',
-  //   });
+  Future<void> ringDoorbell() async {
+    http.Response response = await http
+        .post(Uri.parse("$apiUrl/ring_doorbell"), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    });
 
-  //   if (response.statusCode == 201) {
-  //     return json.decode(response.body);
-  //   } else {
-  //     throw Exception('Failed to post User');
-  //   }
-  // }
+    if (response.statusCode == 200) {
+      // return json.decode(response.body);
+      return;
+    } else {
+      throw Exception('Failed to ring doorbell');
+    }
+  }
 }

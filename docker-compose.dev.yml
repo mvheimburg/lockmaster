@@ -33,7 +33,7 @@ services:
   lock_db:
     build:
       context: db
-      dockerfile: Dockerfile.db.dev
+      dockerfile: Dockerfile.dev
     volumes:
       - 'app-db-data:/var/lib/postgresql/data/pgdata'
     env_file:

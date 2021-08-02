@@ -3,7 +3,7 @@
 from contextlib import contextmanager, AbstractContextManager
 from typing import Callable
 import logging
-from os import environ
+from os import environ, remove
 
 from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
@@ -22,7 +22,12 @@ class Database():
         dbusername = environ.get('POSTGRES_USER', None)
         dbpass = environ.get('POSTGRES_PASSWORD', None)
         dbname = environ.get('POSTGRES_DB', None)
-        dbserver = environ.get('POSTGRES_SERVER', None)
+
+        build_type = environ.get('BUILD_TYPE', None)    
+        if build_type == 'staging':
+            dbserver = environ.get('POSTGRES_SERVER', None)
+        else:
+            dbserver = 'localhost'
 
         self.DATABASE_URI = 'postgresql://'+dbusername+':'+dbpass+'@'+dbserver+'/'+dbname
 
@@ -35,12 +40,18 @@ class Database():
             ),
         )
 
+        # self.delete_db()
+        self.create_database()
+
+        print("databasefactory!")
+
 
 
     def create_database(self) -> None:
         if not database_exists(self.DATABASE_URI):
             create_database(self.DATABASE_URI)
-            Base.metadata.create_all(self._engine)
+
+        Base.metadata.create_all(self._engine)
 
     def delete_db(self) -> None:
         if database_exists(self.DATABASE_URI):

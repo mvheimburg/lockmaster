@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import "package:velocity_x/velocity_x.dart";
 
-import 'package:Doormonitor/screens/doorbellscreen.dart';
+import 'package:doormonitor/screens/doorbellscreen.dart';
+import 'package:doormonitor/screens/pinscreen.dart';
 
-import 'package:Doormonitor/routes.dart';
+import 'package:doormonitor/routes.dart';
 
 void main() {
   // runApp(VxState(store: DoormonitorStore(), child: DoormonitorApp()));
@@ -53,6 +54,7 @@ class _DoormonitorAppState extends State<DoormonitorApp> {
                 ),
               ),
           routes: {
+            Routes.pin: (uri, __) => MaterialPage(child: PinScreen()),
             Routes.home: (uri, __) => MaterialPage(child: DoorbellScreen()),
           }),
     );

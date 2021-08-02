@@ -33,7 +33,7 @@
 # RUN flutter build web
 
 
-FROM balenalib/raspberrypi3-node:12-run
+FROM balenalib/raspberrypi4-64-node:12-run
 
 # use `install_packages` if you need to install dependencies,
 # for instance if you need git, just uncomment the line below.
@@ -44,15 +44,7 @@ ARG CERTRESOLVER
 
 LABEL   traefik.enable="true" \
         traefik.http.routers.doormonitor.entrypoints="web" \
-        # traefik.http.routers.doorcontrol.rule="PathPrefix(`/`) || Host(`doorcontrol.${DOMAIN}`)" \
-        # traefik.http.routers.doormonitor.rule="PathPrefix(`/doormonitor`)" \
-        traefik.http.routers.doormonitor.rule="Host(`d869a34`)" \
-        # traefik.http.routers.doormonitor.tls="true" \
-        # traefik.http.routers.doormonitor.tls.certresolver=${CERTRESOLVER} \
-        # traefik.http.routers.doormonitor.middlewares="doormonitor-stripprefix" \
-        # traefik.http.routers.doormanager.tls="true" \
-        # traefik.http.routers.doormanager.tls.certresolver=${CERTRESOLVER} \
-        # traefik.http.middlewares.doormonitor-stripprefix.stripprefix.prefixes="/doormonitor" \
+        traefik.http.routers.doormonitor.rule="PathPrefix(`/`)" \
         traefik.http.services.doormonitor.loadbalancer.server.port="3000"
 
 # Defines our working directory in container

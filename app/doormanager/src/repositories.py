@@ -4,9 +4,7 @@ from contextlib import AbstractContextManager
 from typing import Callable, Iterator
 import datetime
 
-from sqlalchemy.orm import Session
-
-from models import UserOrm, UserModel
+from models import UserOrm
 
 class Repository():
     def __init__(self, session_factory: Callable) -> None:
@@ -71,6 +69,10 @@ class UserRepository(Repository):
                 raise UserNotFoundError(user_id)
             session.delete(entity)
             session.commit()
+    
+    def reinstall_db(self, user_id: int) -> None:
+       pass
+
 
 
     # def evaluate_mac(self, mac: int) -> None:

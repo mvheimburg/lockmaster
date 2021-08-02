@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
 
   traefik:
@@ -14,6 +14,7 @@ services:
     labels:
       - io.balena.features.balena-socket=true
 
+
   doorcontrol:
     build:
       context: app/web
@@ -24,6 +25,8 @@ services:
       DOORMANAGER_HOST: doormanager
       PORT: 3000
     command: npm start
+    depends_on: 
+      - doormanager
 
   
   doormonitor:
@@ -36,6 +39,8 @@ services:
       DOORMANAGER_HOST: doormanager
       PORT: 3000
     command: npm start
+    depends_on: 
+      - doormanager
 
   doormanager:
     privileged: true
@@ -50,8 +55,9 @@ services:
       - 1883:1883
     depends_on: 
       - lock_db
-    # command: gunicorn main:create_app() -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+      - traefik
     command: gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+    
     
   unifi-controller:
     build:
@@ -73,50 +79,22 @@ services:
       - 8880:8880 #optional
       - 6789:6789 #optional
       - 5514:5514/udp #optional
-    # expose:
-    #   - 8443
-    # labels:
-    #   traefik.enable: true
-    #   traefik.http.routers.unifi.entrypoints: websecure
-    #   # - traefik.http.routers.unifi.rule: PathPrefix(`/unifi{regex:$$|/.*}`)
-    #   # - traefik.http.routers.unifi.rule:  Host(`unifi.$DOMAIN`) || PathPrefix(`/unifi{regex:$$|/.*}
-    #   traefik.http.routers.unifi.rule:  Host(`unifi.${DOMAIN}`)
-    #   # - traefik.http.routers.unifi.tls: true
-    #   traefik.http.routers.unifi.tls.certresolver: duckdns
-    #   traefik.http.routers.unifi.middlewares: unifi-stripprefix
-    #   traefik.http.middlewares.unifi-stripprefix.stripprefix.prefixes: /unifi
-    #   traefik.http.services.unifi.loadbalancer.server.port: 8443
+
 
   lock_db:
     build:
       context: db
-      dockerfile: Dockerfile.db
+      dockerfile: Dockerfile
     volumes:
       - 'app-db-data:/var/lib/postgresql/data/pgdata'
-    # env_file:
-    #   - postgresql/database.env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - 'node.labels.${STACK_NAME?Variable not set}.app-db-data == true'
-  
- 
-  # mqtt:
-  #   image: panuwitp/mosquitto-arm
-  #   ports:
-  #     - "1883:1883"
 
-# networks:
-#   mqtt:
-#   web:
+
+
 
 volumes:
   certs:
   unifi-config: 
   app-db-data:
 
-# networks:
-#   traefik-public:
-#     external: '${TRAEFIK_PUBLIC_NETWORK_IS_EXTERNAL-false}'

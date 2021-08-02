@@ -8,6 +8,7 @@ from fastapi_mqtt import FastMQTT, MQTTConfig
 from containers import Container
 import endpoints as ep
 
+
 def create_app() -> FastAPI:
     app = FastAPI()
     
@@ -20,11 +21,12 @@ def create_app() -> FastAPI:
     # doormanager=container.doormanager()
     # doormanager.connect_to_broker()
     # doormanager.subscribe()
-    doormanager=app.container.doormanager()
+    bell_service=app.container.bell_service()
+    door_service=app.container.door_service()
 
-    db = app.container.db()
-    # db.delete_db()
-    db.create_database()
+    # db = app.container.db()
+    # # db.delete_db()
+    # db.create_database()
 
     
 
@@ -62,14 +64,16 @@ def create_app() -> FastAPI:
         def connect(client, flags, rc, properties):
             # mqtt.client.subscribe("/mqtt") #subscribing mqtt topic
             print("Connected: ", client, flags, rc, properties)
-            doormanager.subscribe(client)
+            bell_service.set_mqttc(mqttc=client)
+            door_service.set_mqttc(mqttc=client)
+            door_service.subscribe()
 
 
         @mqtt.on_message()
         async def message(client, topic, payload, qos, properties):
             print("Message: ", client, topic, payload)
             # payload_str = msg.payload.decode("utf-8") 
-            doormanager.mqtt_on_message(client, topic, payload.decode())
+            door_service.mqtt_on_message(topic, payload.decode())
 
 
         @mqtt.on_disconnect()
@@ -80,7 +84,7 @@ def create_app() -> FastAPI:
         def subscribe(client, mid, qos, properties):
             print("subscribed", client, mid, qos, properties)
 
-    # app.container = container
+
     print("include_router")
     app.include_router(ep.router)
 

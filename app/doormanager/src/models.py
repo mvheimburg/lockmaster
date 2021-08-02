@@ -7,6 +7,13 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from database import Base
+import gpiozero
+
+
+from const import(
+     COMMAND_PAYLOAD
+    ,STATUS_PAYLOAD
+)
 
 # from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
@@ -16,8 +23,8 @@ class UserOrm(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    mac = Column(String, unique=True, nullable=True)
-    pin = Column(Integer, unique=True, nullable=True)
+    mac = Column(String, nullable=True)
+    pin = Column(Integer, unique=True, nullable=False)
     start=Column(DateTime, default=dt.datetime.utcnow)
     end=Column(DateTime, nullable=True)
     access_level = Column(Integer, default=1)
@@ -52,3 +59,91 @@ class MacListModel(BaseModel):
 class AccessModel(BaseModel):
     access_level: int
 # PydanticUser = sqlalchemy_to_pydantic(UserOrm)
+
+
+class Door(BaseModel):
+    name: str
+    command_topic: str
+    state_topic: str
+    state: str = "Unkknown"
+    # pin: int
+    relay: gpiozero.OutputDevice
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    # def __init__(self, name:str, command_topic: str, state_topic: str, pin: int):
+    #     # self.state = DoorState(name=name, pin=pin, command_topic=command_topic, state_topic=state_topic)
+    #     self.name=name
+    #     self.command_topic=command_topic
+    #     self.state_topic=state_topic
+
+
+    # def set_relay(self):
+    #     self.relay = gpiozero.OutputDevice(self.pin, active_high=False, initial_value=False)
+
+
+    def startup(self):
+        self.update_status()
+
+
+    def update_status(self):
+        if self.relay.value:
+            self.state = STATUS_PAYLOAD.UNLOCKED
+        else:
+            self.state = STATUS_PAYLOAD.LOCKED
+
+
+    def unlock(self):
+        print(f"Unlocking door {self.name}")
+        self.relay.on()
+        self.update_status()
+
+    def lock(self):
+        print(f"Locking door {self.name}")
+        self.relay.off()
+        self.update_status()
+
+    def toggle_door(self):
+        print(f"Toggling door {self.name}")
+        self.relay.toggle()
+        self.update_status()
+
+
+    def get_state(self):
+        return self.state
+
+
+
+
+class DoorDummy(BaseModel):
+    name: str
+    command_topic: str
+    state_topic: str
+    state: str = "Unkknown"
+    pin: int
+
+
+
+    def startup(self):
+        self.update_status()
+
+
+    def update_status(self):
+        pass
+
+    def unlock(self):
+        print(f"Locking door {self.name}")
+        self.update_status()
+
+
+    def lock(self):
+        print(f"Locking door {self.name}")
+        self.update_status()
+
+    def toggle_door(self):
+        print(f"Toggling door {self.name}")
+        self.update_status()
+
+    def get_state(self):
+        return self.state

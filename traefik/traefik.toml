@@ -31,14 +31,16 @@ address = ":443"
 #     main = "lvh.duckdns.org"
 #     sans = ["doorcontrol.lvh.duckdns.org"]
 
-# [certificatesResolvers.staging.acme]
-# email = "$ACME_EMAIL"
-# storage = "/var/certs/acme-staging.json"
-# caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+[certificatesResolvers.staging.acme]
+email = "$ACME_EMAIL"
+storage = "/var/certs/acme.json"
+caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 
-#     [certificatesResolvers.duckdns.acme.dnsChallenge]
-#     provider = "duckdns"
-#     delayBeforeCheck = 0
+[certificatesResolvers.staging.acme.dnsChallenge]
+provider = "duckdns"
+delayBeforeCheck = 0
+
+
 
 [certificatesResolvers.duckdns.acme]
 email = "$ACME_EMAIL"
@@ -56,10 +58,10 @@ watch = true
 [providers.docker]
 endpoint = "unix:///var/run/balena.sock"
 exposedByDefault = false
-# defaultRule = "Host(`$LOCKMASTER_HOST`)"
+defaultRule = "Host(`$LOCKMASTER_HOST`)"
 
-[pilot]
-token = "effb8cb0-d258-47ff-adcc-1b4c907b3d42"
+# [pilot]
+# token = "effb8cb0-d258-47ff-adcc-1b4c907b3d42"
 
 [http.serversTransports.mytransport]
 insecureSkipVerify = true
