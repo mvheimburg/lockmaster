@@ -23,7 +23,7 @@ class UserOrm(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    mac = Column(String, nullable=True)
+    uuid = Column(String, nullable=True)
     pin = Column(Integer, unique=True, nullable=False)
     start=Column(DateTime, default=dt.datetime.utcnow)
     end=Column(DateTime, nullable=True)
@@ -33,7 +33,7 @@ class UserOrm(Base):
     def __repr__(self):
         return f'<User(id="{self.id}", ' \
                f'name="{self.name}", ' \
-               f'mac="{self.mac}", ' \
+               f'uuid="{self.uuid}", ' \
                f'pin="{self.pin}", ' \
                f'start="{self.start}", ' \
                f'end="{self.end}", ' \
@@ -43,18 +43,18 @@ class UserOrm(Base):
 
 class UserModel(BaseModel):
     name:str
-    mac:Optional[str]
+    uuid:Optional[str]
     pin:Optional[int]
     end:Optional[dt.datetime]
     access_level:int
 
 
-class MacModel(BaseModel):
-    mac: str
+class BeaconModel(BaseModel):
+    uuid: str
     rssi: int
 
-class MacListModel(BaseModel):
-    candidates: List[MacModel]
+class BeaconListModel(BaseModel):
+    candidates: List[BeaconModel]
 
 class AccessModel(BaseModel):
     access_level: int
@@ -65,7 +65,7 @@ class Door(BaseModel):
     name: str
     command_topic: str
     state_topic: str
-    state: str = "Unkknown"
+    state: str = "Unknown"
     # pin: int
     relay: gpiozero.OutputDevice
 
@@ -120,7 +120,7 @@ class DoorDummy(BaseModel):
     name: str
     command_topic: str
     state_topic: str
-    state: str = "Unkknown"
+    state: str = "Unknown"
     pin: int
 
 

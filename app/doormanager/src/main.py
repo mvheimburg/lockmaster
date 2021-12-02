@@ -18,17 +18,8 @@ def create_app() -> FastAPI:
     app.container.config.from_yaml(config_path)
     app.container.wire(modules=[ep])
 
-    # doormanager=container.doormanager()
-    # doormanager.connect_to_broker()
-    # doormanager.subscribe()
     bell_service=app.container.bell_service()
-    door_service=app.container.door_service()
-
-    # db = app.container.db()
-    # # db.delete_db()
-    # db.create_database()
-
-    
+    door_service=app.container.door_service()  
 
     app.add_middleware(
         CORSMiddleware,
@@ -38,12 +29,15 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    build_type = environ.get('BUILD_TYPE', None)    
-    if build_type == 'staging':
+    build_type = environ.get('BUILD_TYPE', None)   
+
+    if build_type == 'release':
         print("Going MQTT")
 
         host = environ.get('MQTT_HOST', 'mqtt://localhost')
-        port = environ.get('MQTT_PORT', '1883')
+        print(f"host: {host}")
+        port = int(environ.get('MQTT_PORT', 1883))
+        print(f"port: {port}")
         username = environ.get('MQTT_USERNAME', None)
         password = environ.get('MQTT_PASSWORD', None)
 

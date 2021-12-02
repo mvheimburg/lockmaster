@@ -16,12 +16,12 @@
 
 [http.middlewares]
 
-[http.middlewares.basic-auth.basicAuth]
-users = [
-    $BASICAUTH_USERS
-]
+# [http.middlewares.basic-auth.basicAuth]
+# users = [
+#     "${BASICAUTH_USERS}"
+# ]
 
 [http.middlewares.ip-allowlist.ipWhiteList]
 sourceRange = [
-    $IP_ALLOWLIST
+    "${IP_ALLOWLIST}"
 ]

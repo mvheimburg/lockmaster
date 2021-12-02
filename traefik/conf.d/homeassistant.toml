@@ -13,18 +13,18 @@
 
 [http.routers]
 [http.routers.to-homeassistant]
-rule = "Host(`ha.$DOMAIN`)"
+rule = "Host(`ha.${DOMAIN}`)"
 service = "homeassistant"
 middlewares = ["hsts-header"]
 
 # middlewares = ["hsts-header", "ip-allowlist"]
 [http.routers.to-homeassistant.tls]
-certresolver = "$CERTRESOLVER"
+certresolver = "${CERTRESOLVER}"
 
 [http.services]
 [http.services.homeassistant.loadBalancer]
 [[http.services.homeassistant.loadBalancer.servers]]
-url = "$HOMEASSISTANT_SERVER"
+url = "${HOMEASSISTANT_SERVER}"
 
 
 

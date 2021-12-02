@@ -3,13 +3,13 @@
 from uuid import uuid4
 from typing import Iterator, List
 
-from repositories import UserRepository, MacNotFoundError
-from models import UserOrm, MacModel, AccessModel
+from repositories import UserRepository, BeaconNotFoundError
+from models import UserOrm, BeaconModel, AccessModel
 import logging
 
 logger = logging.getLogger(__name__)
 
-class UserService:
+class UserService():
 
     def __init__(self, user_repository: UserRepository) -> None:
         self._repository: UserRepository = user_repository

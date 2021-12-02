@@ -15,7 +15,7 @@ from const import(
 
 build_type = environ.get('BUILD_TYPE', None)
 print(f"build_type: {build_type}")
-if build_type == 'staging':
+if build_type == 'release':
     import gpiozero
     from models import Door
 else:
@@ -36,7 +36,7 @@ class DoorService:
 
         for door, cfg in  doors_cfg.items():
             print(f"new_door: {door}")
-            if build_type == 'staging':
+            if build_type == 'release':
                 new_door = Door(name=door, command_topic=cfg['command_topic'], state_topic=cfg['state_topic'], relay=gpiozero.OutputDevice(cfg['pin'], active_high=False, initial_value=False))
             else:
                 new_door = Door(name=door, command_topic=cfg['command_topic'], state_topic=cfg['state_topic'], pin=cfg['pin'])

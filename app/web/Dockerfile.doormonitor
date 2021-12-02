@@ -33,7 +33,7 @@
 # RUN flutter build web
 
 
-FROM balenalib/raspberrypi4-64-node:12-run
+FROM balenalib/raspberrypi4-64-node:17-run
 
 # use `install_packages` if you need to install dependencies,
 # for instance if you need git, just uncomment the line below.

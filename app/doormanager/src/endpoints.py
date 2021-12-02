@@ -1,6 +1,6 @@
 """Endpoints module."""
 
-from fastapi import APIRouter, Depends, Response, status, Form
+from fastapi import APIRouter, Depends, Response, status, Form, Body
 from dependency_injector.wiring import inject, Provide
 
 from containers import Container
@@ -10,7 +10,7 @@ from repositories import NotFoundError
 
 import logging
 
-from models import UserModel, MacListModel
+from models import UserModel, BeaconListModel
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ router = APIRouter()
 
 @router.get('/get_users')
 @inject
-def get_users(
+async def get_users(
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
     print('/get_users')
@@ -28,7 +28,7 @@ def get_users(
 
 @router.get('/get_user/{user_id}')
 @inject
-def get_by_id(
+async def get_by_id(
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
@@ -41,7 +41,7 @@ def get_by_id(
 
 @router.post('/create_user', status_code=status.HTTP_201_CREATED)
 @inject
-def add(
+async def add(
         user: UserModel,
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
@@ -51,7 +51,7 @@ def add(
 
 @router.post('/test_user', status_code=status.HTTP_201_CREATED)
 @inject
-def test_add(
+async def test_add(
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
     print('/test_user')
@@ -61,7 +61,7 @@ def test_add(
 
 @router.delete('/delete_user/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
 @inject
-def remove(
+async def remove(
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
@@ -75,24 +75,24 @@ def remove(
 
 
 @router.get('/status')
-def get_status():
+async def get_status():
     print('/status')
     return {'status': 'OK'}
 
 
-@router.post('/post_candidate_list', status_code=status.HTTP_200_OK)
-@inject
-def post_candidate_list(
-        candidates: MacListModel,
-        access_service: AccessService = Depends(Provide[Container.access_service]),
-):
-    print('/post_candidate_list')
-    return access_service.post_candidate_list(candidates)
+# @router.put('/post_candidate_list', status_code=status.HTTP_200_OK)
+# @inject
+# async def post_candidate_list(
+#         candidates: BeaconListModel,
+#         access_service: AccessService = Depends(Provide[Container.access_service]),
+# ):
+#     print('/post_candidate_list')
+#     return access_service.post_candidate_list(candidates)
 
 
 # @router.get('/doormanager/get_access_level', status_code=status.HTTP_200_OK)
 # @inject
-# def get_access_level(
+# async def get_access_level(
 #     access_service: AccessService = Depends(Provide[Container.access_service]),
 # ):
 #     print('/doormanager/get_access_level')
@@ -100,26 +100,36 @@ def post_candidate_list(
 
 @router.get('/get_access_level')
 @inject
-def get_access_level(
+async def get_access_level(
     access_service: AccessService = Depends(Provide[Container.access_service]),
 ):
     print('/get_access_level')
     return access_service.get_access_level()
 
 
-@router.get('/get_access_level_by_pin/{pin}')
+@router.put('/get_access_level_by_pin/')
 @inject
-def get_access_level_by_pin(
-    pin: int,
+async def get_access_level_by_pin(
+    pin: int=Body(...),
     access_service: AccessService = Depends(Provide[Container.access_service]),
 ):
-    print('/get_access_level_by_pin')
+    print('/get_access_level_by_pin/')
     return access_service.get_access_level_by_pin(pin)
+
+
+@router.put('/detected_beacon/')
+@inject
+async def detected_beacon(
+    uuid: str=Body(...),
+    access_service: AccessService = Depends(Provide[Container.access_service]),
+):
+    print('/detected_beacon/')
+    return access_service.detected_beacon(uuid)
 
 
 @router.get('/get_current_candidate_list')
 @inject
-def get_current_candidate_list(
+async def get_current_candidate_list(
     access_service: AccessService = Depends(Provide[Container.access_service]),
 ):
     print('/get_current_candidate_list')
@@ -129,7 +139,7 @@ def get_current_candidate_list(
 
 @router.post('/ring_doorbell', status_code=status.HTTP_200_OK)
 @inject
-def ring_doorbell(
+async def ring_doorbell(
     bell_service: BellService = Depends(Provide[Container.bell_service]),
 ):
     print('/ring_doorbell')
@@ -138,7 +148,7 @@ def ring_doorbell(
 
 @router.post('/delete_db', status_code=status.HTTP_200_OK)
 @inject
-def ring_doorbell(
+async def ring_doorbell(
     user_service: UserService = Depends(Provide[Container.user_service]),
 ):
     print('/ring_doorbell')

@@ -12,6 +12,7 @@ class Repository():
 
 
 class UserRepository(Repository):
+
     def get_all(self) -> Iterator[UserOrm]:
         with self.session_factory() as session:
             return session.query(UserOrm).all()
@@ -23,13 +24,20 @@ class UserRepository(Repository):
                 raise UserIdNotFoundError(user_id)
             return entity
 
-    def get_by_mac(self, mac: str) -> UserOrm:
+    def get_by_uuid(self, uuid: str) -> UserOrm:
         with self.session_factory() as session:
-            entity = session.query(UserOrm).filter(UserOrm.mac == mac).first()
+            entity = session.query(UserOrm).filter(UserOrm.uuid == uuid).first()
             if not entity:
-                raise MacNotFoundError(mac)
+                raise BeaconNotFoundError(uuid)
             return entity
 
+    def get_by_pin(self, pin: int) -> UserOrm:
+        with self.session_factory() as session:
+            entity = session.query(UserOrm).filter(UserOrm.pin == pin).first()
+            if not entity:
+                raise PinNotFoundError(pin)
+            return entity
+    
     def get_by_pin(self, pin: int) -> UserOrm:
         with self.session_factory() as session:
             entity = session.query(UserOrm).filter(UserOrm.pin == pin).first()
@@ -47,15 +55,15 @@ class UserRepository(Repository):
             return entity
 
 
-    def edit(self, name: str, mac: str = None, pin: int = None, end: datetime.datetime = None, access_level: int = 1, is_active: bool = True) -> UserOrm:
-        entity = session.query(UserOrm).filter(UserOrm.id == user_id).first()
-        entity.name = name
-        entity.mac = mac
-        entity.pin = pin
-        entity.end = end
-        entity.access_level = access_level
-        entity.is_active = is_active
+    def edit(self, user_id: int, name: str, mac: str = None, pin: int = None, end: datetime.datetime = None, access_level: int = 1, is_active: bool = True) -> UserOrm:
         with self.session_factory() as session:
+            entity = session.query(UserOrm).filter(UserOrm.id == user_id).first()
+            entity.name = name
+            entity.mac = mac
+            entity.pin = pin
+            entity.end = end
+            entity.access_level = access_level
+            entity.is_active = is_active
             session.add(entity)
             session.commit()
             session.refresh(entity)
@@ -64,9 +72,9 @@ class UserRepository(Repository):
 
     def delete_by_id(self, user_id: int) -> None:
         with self.session_factory() as session:
-            entity: UserOrm = session.query(UserOrm).filter(User.id == user_id).first()
+            entity: UserOrm = session.query(UserOrm).filter(UserOrm.id == user_id).first()
             if not entity:
-                raise UserNotFoundError(user_id)
+                raise UserIdNotFoundError(user_id)
             session.delete(entity)
             session.commit()
     
@@ -98,7 +106,7 @@ class UserIdNotFoundError(IdNotFoundError):
     entity_name: str = 'User'
 
 
-class MacNotFoundError(NotFoundError):
+class BeaconNotFoundError(NotFoundError):
     entity_name: str = 'MAC'
 
 class PinNotFoundError(NotFoundError):

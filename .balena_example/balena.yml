@@ -1,0 +1,33 @@
+
+build-variables:
+  global:
+    - PROJECT_NAME=xxx
+    - DOMAIN=xxx.duckdns.org
+    - CERTRESOLVER=prod
+    - BUILD_TYPE=release
+    - POSTGRES_SERVER=
+    - POSTGRES_USER=
+    - POSTGRES_PASSWORD=
+    - POSTGRES_DB=lockaster
+
+  doormanager:
+    - VIRTUAL_ENV=venv
+    - MQTT_CLIENT_ID=
+    - MQTT_HOST=
+    - MQTT_PORT=
+    - MQTT_USERNAME=
+    - MQTT_PASSWORD=
+
+  traefik:
+    - IP_ALLOWLIST=192.168.x.x/24
+    - ACME_EMAIL=
+    - HOMEASSISTANT_IP=
+    - HOMEASSISTANT_PORT=
+    - HOMEASSISTANT_SERVER=http://HOMEASSISTANT_IP:HOMEASSISTANT_PORT/
+    - LOCKMASTER_HOST=
+    - PROVIDER=duckdns
+    - DUCKDNS_TOKEN=
+
+
+
+

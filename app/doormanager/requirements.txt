@@ -7,15 +7,13 @@ fastapi
 fastapi-mqtt
 fastapi-utils
 gunicorn
-uvicorn[standard]
+uvicorn
 # PyDispatcher
 pydantic
 # psycopg2
 psycopg2-binary
-# fastapi-sqlalchemy
 sqlalchemy
 sqlalchemy-utils
-# databases[postgresql]
 python-box
 dependency-injector
 pydantic_sqlalchemy

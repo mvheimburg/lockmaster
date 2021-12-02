@@ -24,7 +24,7 @@ class Database():
         dbname = environ.get('POSTGRES_DB', None)
 
         build_type = environ.get('BUILD_TYPE', None)    
-        if build_type == 'staging':
+        if build_type == 'release':
             dbserver = environ.get('POSTGRES_SERVER', None)
         else:
             dbserver = 'localhost'
@@ -40,7 +40,7 @@ class Database():
             ),
         )
 
-        # self.delete_db()
+        self.delete_db()
         self.create_database()
 
         print("databasefactory!")
