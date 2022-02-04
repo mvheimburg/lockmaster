@@ -22,4 +22,5 @@ doc/api/
 /.vscode
 api_secrets.json
 mqtt_secrets.json
+
 .balena/

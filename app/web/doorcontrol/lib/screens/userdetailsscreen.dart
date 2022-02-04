@@ -45,8 +45,8 @@ class UserDetailsScreen extends StatelessWidget {
                   ),
                   ListTile(
                     leading: Icon(Icons.bluetooth),
-                    title: Text('Mac'),
-                    subtitle: Text(user.mac.toString()),
+                    title: Text('uuid'),
+                    subtitle: Text(user.uuid.toString()),
                   ),
                   ListTile(
                     leading: Icon(Icons.lock_clock),

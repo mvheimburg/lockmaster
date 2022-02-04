@@ -10,19 +10,19 @@ from repositories import NotFoundError
 
 import logging
 
-from models import UserModel, BeaconListModel
+from models import UserModel
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get('/get_users')
+@router.get('/get_users/')
 @inject
 async def get_users(
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    print('/get_users')
+    print('/get_users/')
     return user_service.get_users()
 
 
@@ -39,22 +39,26 @@ async def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.post('/create_user', status_code=status.HTTP_201_CREATED)
+@router.post('/create_user/', status_code=status.HTTP_201_CREATED)
 @inject
 async def add(
         user: UserModel,
         user_service: UserService = Depends(Provide[Container.user_service]),
+        access_service: AccessService = Depends(Provide[Container.access_service])
 ):
-    print('/create_users')
-    return user_service.create_user(user.dict())
+    print('/create_user/')
+    new_user = user_service.create_user(user.dict())
+    if new_user:
+        access_service.user_created(new_user)
+    return new_user
 
 
-@router.post('/test_user', status_code=status.HTTP_201_CREATED)
+@router.post('/test_user/', status_code=status.HTTP_201_CREATED)
 @inject
 async def test_add(
         user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    print('/test_user')
+    print('/test_user/')
     return user_service.create_test_user()
 
 
@@ -74,9 +78,9 @@ async def remove(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get('/status')
+@router.get('/status/')
 async def get_status():
-    print('/status')
+    print('/status/')
     return {'status': 'OK'}
 
 
@@ -117,39 +121,42 @@ async def get_access_level_by_pin(
     return access_service.get_access_level_by_pin(pin)
 
 
-@router.put('/detected_beacon/')
-@inject
-async def detected_beacon(
-    uuid: str=Body(...),
-    access_service: AccessService = Depends(Provide[Container.access_service]),
-):
-    print('/detected_beacon/')
-    return access_service.detected_beacon(uuid)
+# @router.put('/detected_beacon/')
+# @inject
+# async def detected_beacon(
+#     beacon: BeaconModel,
+#     access_service: AccessService = Depends(Provide[Container.access_service]),
+# ):
+#     print('/detected_beacon/')
+#     return access_service.detected_beacon(beacon)
 
 
-@router.get('/get_current_candidate_list')
+@router.get('/get_current_candidate_list/')
 @inject
 async def get_current_candidate_list(
     access_service: AccessService = Depends(Provide[Container.access_service]),
 ):
-    print('/get_current_candidate_list')
-    return access_service.get_current_candidate_list()
+    print('/get_current_candidate_list/')
+    try:
+        return access_service.get_current_candidate_list()
+    except Exception as e:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 
-@router.post('/ring_doorbell', status_code=status.HTTP_200_OK)
+@router.post('/ring_doorbell/', status_code=status.HTTP_200_OK)
 @inject
 async def ring_doorbell(
     bell_service: BellService = Depends(Provide[Container.bell_service]),
 ):
-    print('/ring_doorbell')
+    print('/ring_doorbell/')
     return bell_service.ring_doorbell()
 
 
-@router.post('/delete_db', status_code=status.HTTP_200_OK)
+@router.post('/delete_db/', status_code=status.HTTP_200_OK)
 @inject
-async def ring_doorbell(
+async def delete_db(
     user_service: UserService = Depends(Provide[Container.user_service]),
 ):
-    print('/ring_doorbell')
+    print('/delete_db/')
     return user_service.delete_db()

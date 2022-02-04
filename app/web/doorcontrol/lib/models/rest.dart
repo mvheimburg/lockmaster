@@ -8,7 +8,7 @@ class User {
   final int? id;
   final String name;
   final int? pin;
-  final String? mac;
+  final String? uuid;
   final String? start;
   final String? end;
   final int accessLevel;
@@ -17,7 +17,7 @@ class User {
       {this.id,
       required this.name,
       this.pin,
-      this.mac,
+      this.uuid,
       this.start,
       this.end,
       required this.accessLevel});
@@ -27,20 +27,19 @@ class User {
         id: json['id'],
         name: json['name'],
         pin: json['pin'],
-        mac: json['mac'],
+        uuid: json['uuid'],
         start: json['start'],
         end: json['end'],
         accessLevel: json['access_level']);
   }
 }
 
-class Candidate {
-  final String mac;
-  final int rssi;
+// class Candidate {
+//   final String uuid;
 
-  Candidate({required this.mac, required this.rssi});
+//   Candidate({required this.uuid});
 
-  factory Candidate.fromJson(Map<String, dynamic> json) {
-    return Candidate(mac: json['mac'], rssi: json['rssi']);
-  }
-}
+//   factory Candidate.fromJson(Map<String, dynamic> uuid) {
+//     return Candidate(uuid: uuid);
+//   }
+// }

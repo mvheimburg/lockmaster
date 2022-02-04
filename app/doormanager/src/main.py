@@ -1,5 +1,5 @@
 """Application module."""
-from os import environ, path
+from os import access, environ, path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +20,7 @@ def create_app() -> FastAPI:
 
     bell_service=app.container.bell_service()
     door_service=app.container.door_service()  
+    access_service=app.container.access_service()  
 
     app.add_middleware(
         CORSMiddleware,
@@ -58,16 +59,23 @@ def create_app() -> FastAPI:
         def connect(client, flags, rc, properties):
             # mqtt.client.subscribe("/mqtt") #subscribing mqtt topic
             print("Connected: ", client, flags, rc, properties)
+            access_service.set_mqttc(mqttc=client)
             bell_service.set_mqttc(mqttc=client)
             door_service.set_mqttc(mqttc=client)
+            access_service.subscribe()
             door_service.subscribe()
 
 
         @mqtt.on_message()
         async def message(client, topic, payload, qos, properties):
-            print("Message: ", client, topic, payload)
+            # print("Message: ", client, topic, payload)
             # payload_str = msg.payload.decode("utf-8") 
-            door_service.mqtt_on_message(topic, payload.decode())
+            topiclist=topic.split("/")
+            if topiclist[0] == "door":
+                door_service.mqtt_on_message(topic, payload.decode())
+            elif topiclist[0] == "room-assistant":
+                access_service.mqtt_on_message(client, properties, topiclist, payload.decode())
+            
 
 
         @mqtt.on_disconnect()

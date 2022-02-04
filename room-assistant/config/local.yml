@@ -1,0 +1,32 @@
+cluster:
+  peerAddresses: 
+    - 192.168.1.100:6425
+  port: 6425
+global:
+  instanceName: teknisk
+  integrations:
+    - bluetoothLowEnergy
+    - homeAssistant
+bluetoothLowEnergy:
+  onlyIBeacon: true
+  allowlist:
+    - 33a7dd2b71064e0ba49baae10bd40627-100-1
+    - 4a339d2967b74608b343b150cc5db838-100-1
+  # denylist: 
+  #   - d1338ace002d44af88d1e57c12484966-1-20041
+  #   - d1338ace002d44af88d1e57c12484966-1-38819
+  #   - 557ae8f27d7b41b3af5db3469e16ba43-100-1
+  #   - e20a39f473f54bc4186417d1ad07a962-49971-61237
+  #   - e20a39f473f54bc4186417d1ad07a962-22381-54499
+  #   - d1338ace002d44af88d1e57c48004966-1-38819
+  #   - d1338ace002d44af88d1e57c12484900-1-38819
+  #   - 74278bdab64445208f0c720eaf059935-256-59973
+  #   - d1332d0044af88d1e57c124849660001-38819-50602
+  #   - d1338ace002d44af88d1e57c12484966-1-23442
+  # maxDistance: 5
+  # maxDistance: 5
+homeAssistant:
+  mqttUrl: mqtt://192.168.1.2:1883
+  mqttOptions:
+    username: tekniskprecense
+    password: tekniskprecense!

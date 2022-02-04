@@ -17,3 +17,5 @@ sqlalchemy-utils
 python-box
 dependency-injector
 pydantic_sqlalchemy
+requests
+ujson

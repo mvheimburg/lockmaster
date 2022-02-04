@@ -68,9 +68,9 @@ class DoorService:
     
     
     def mqtt_on_message(self, topic, payload):
-        print("Doormanager message: ", topic, payload) 
         for door in self.doors:
             if topic == door.command_topic:
+                print("Doormanager message: ", topic, payload) 
                 if payload == COMMAND_PAYLOAD.LOCK:
                     print(f"Doormanager message: Locking door {door}") 
                     door.lock()

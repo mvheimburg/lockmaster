@@ -24,7 +24,7 @@ class UserOrm(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
     uuid = Column(String, nullable=True)
-    pin = Column(Integer, unique=True, nullable=False)
+    pin = Column(Integer, nullable=False)
     start=Column(DateTime, default=dt.datetime.utcnow)
     end=Column(DateTime, nullable=True)
     access_level = Column(Integer, default=1)
@@ -49,14 +49,19 @@ class UserModel(BaseModel):
     access_level:int
 
 
-class BeaconModel(BaseModel):
-    uuid: str
-    rssi: int
+# class UuidAccessModel(BaseModel):
+#     uuid: str
+#     access_level: int
 
-class BeaconListModel(BaseModel):
-    candidates: List[BeaconModel]
+    # def __str__(self):
+    #  return self.uuid
+
+
+# class BeaconListModel(BaseModel):
+#     candidates: List[BeaconModel]
 
 class AccessModel(BaseModel):
+    name:Optional[str]
     access_level: int
 # PydanticUser = sqlalchemy_to_pydantic(UserOrm)
 

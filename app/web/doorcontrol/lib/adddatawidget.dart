@@ -20,7 +20,7 @@ class _AddDataWidgetState extends State<AddDataWidget> {
   final GlobalKey<FormState> _addFormKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _pinController = TextEditingController();
-  final _macController = TextEditingController();
+  final _uuidController = TextEditingController();
   final _endController = TextEditingController();
   final _accessLevelController = TextEditingController();
   // String status = 'positive';
@@ -34,7 +34,7 @@ class _AddDataWidgetState extends State<AddDataWidget> {
         api.createUser(User(
             name: _nameController.text,
             pin: int.parse(_pinController.text),
-            mac: _macController.text,
+            uuid: _uuidController.text,
             end: _endController.text,
             accessLevel: int.parse(_accessLevelController.text)));
 
@@ -107,11 +107,11 @@ class _AddDataWidgetState extends State<AddDataWidget> {
                           margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
                           child: Column(
                             children: <Widget>[
-                              Text('MAC'),
+                              Text('uuid'),
                               TextFormField(
-                                controller: _macController,
+                                controller: _uuidController,
                                 decoration: const InputDecoration(
-                                  hintText: 'MAC',
+                                  hintText: 'uuid',
                                 ),
                                 validator: (value) {
                                   if (value.toString().isEmpty) {

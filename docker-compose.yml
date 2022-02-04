@@ -46,10 +46,11 @@ services:
     build:
       context: app/doormanager
       dockerfile: Dockerfile
+    # network_mode: host
     expose:
       - 5555
-    ports:
-      - 1883:1883
+    # ports:
+    #   - 1883:1883
     depends_on: 
       - lock_db
       - traefik
@@ -66,7 +67,7 @@ services:
       PGID: 1000
       # - MEM_LIMIT=1024M #optional
     volumes:
-      - unifi-config:/config
+      - unifi-data:/unifi
     ports:
       - 3478:3478/udp
       - 10001:10001/udp
@@ -89,10 +90,21 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
 
 
+  ra-teknisk:
+    build: 
+      context: room-assistant
+      dockerfile: Dockerfile
+    network_mode: host
+    restart: always
+    labels:
+      io.balena.features.dbus: 1 
+    ports:
+      - 6425:6425
+      - 6415:6415
 
 
 volumes:
   certs:
-  unifi-config: 
+  unifi-data: 
   app-db-data:
 

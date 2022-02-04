@@ -40,7 +40,7 @@ class Database():
             ),
         )
 
-        self.delete_db()
+        # self.delete_db()
         self.create_database()
 
         print("databasefactory!")
@@ -58,8 +58,8 @@ class Database():
             drop_database(self.DATABASE_URI)
 
     @contextmanager
-    # def session(self) -> Callable[..., AbstractContextManager[Session]]:
     def session(self) -> Callable:
+    # def session(self) -> Callable:
         session: Session = self._session_factory()
         try:
             yield session

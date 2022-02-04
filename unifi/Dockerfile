@@ -1,4 +1,5 @@
-FROM ghcr.io/linuxserver/unifi-controller:latest
+# FROM linuxserver/unifi-controller:latest
+FROM jacobalberty/unifi:latest
 
 ARG DOMAIN
 ARG CERTRESOLVER

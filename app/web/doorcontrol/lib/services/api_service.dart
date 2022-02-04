@@ -24,7 +24,7 @@ class ApiService {
 
   Future<List<User>> getUsers() async {
     final http.Response response =
-        await http.get(Uri.parse("$apiUrl/get_users"));
+        await http.get(Uri.parse("$apiUrl/get_users/"));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -36,14 +36,18 @@ class ApiService {
     }
   }
 
-  Future<List<Candidate>> getCandidates() async {
+  Future<List<String>> getCandidates() async {
     final http.Response response =
-        await http.get(Uri.parse("$apiUrl/get_current_candidate_list"));
+        await http.get(Uri.parse("$apiUrl/get_current_candidate_list/"));
 
     if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List<Candidate> candidates =
-          body.map((dynamic item) => Candidate.fromJson(item)).toList();
+      print(response.body);
+      List<String> candidates = jsonDecode(response.body);
+      // print(body);
+      // List<Candidate> candidates =
+      //     body.map((dynamic item) => Candidate.fromJson(item)).toList();
+      // List<String> candidates =
+      //     candidates_.map((dynamic item) => item.uuid).toList();
       return candidates;
     } else {
       throw "Failed to load User list";
@@ -64,13 +68,13 @@ class ApiService {
     Map data = {
       'name': user.name,
       'pin': user.pin,
-      'mac': user.mac,
+      'uuid': user.uuid,
       'end': user.end,
       'access_level': user.accessLevel
     };
 
     http.Response response = await http.post(
-      Uri.parse("$apiUrl/create_user"),
+      Uri.parse("$apiUrl/create_user/"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -88,7 +92,7 @@ class ApiService {
     Map data = {
       'name': user.name,
       'pin': user.pin,
-      'mac': user.mac,
+      'uuid': user.uuid,
       'end': user.end,
       'access_level': user.accessLevel
     };

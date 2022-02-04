@@ -4,7 +4,7 @@ from uuid import uuid4
 from typing import Iterator, List
 
 from repositories import UserRepository, BeaconNotFoundError
-from models import UserOrm, BeaconModel, AccessModel
+from models import UserOrm, AccessModel
 import logging
 
 logger = logging.getLogger(__name__)

@@ -15,16 +15,17 @@ class _AddUserScreenState extends State<AddUserScreen> {
   final GlobalKey<FormState> _addFormKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _pinController = TextEditingController();
-  final _macController = TextEditingController();
+  final _uuidController = TextEditingController();
   final _endController = TextEditingController();
   var _endControllerSupport = DateTime.now();
   final _accessLevelController = TextEditingController();
   // String status = 'positive';
   // Status _status = Status.positive;
 
-  String _chosenValue = "Velg MAC fra liste";
+  String _chosenValue = "Velg Uuid fra liste";
+  // Candidate? _chosenValue;
 
-  Future<List<Candidate>>? _candidateList;
+  Future<List<String>>? _candidateList;
 
   var timetext = Text('Velg tid');
 
@@ -41,7 +42,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
         api.createUser(User(
             name: _nameController.text,
             pin: int.parse(_pinController.text),
-            mac: _macController.text,
+            uuid: _uuidController.text,
             end: _endController.text,
             accessLevel: int.parse(_accessLevelController.text)));
       }
@@ -108,20 +109,20 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         ),
                         Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                            child: FutureBuilder<List<Candidate>>(
+                            child: FutureBuilder<List<String>>(
                                 future: _candidateList,
                                 builder: (BuildContext context,
-                                    AsyncSnapshot<List<Candidate>> snapshot) {
+                                    AsyncSnapshot<List<String>> snapshot) {
                                   switch (snapshot.connectionState) {
                                     case ConnectionState.none:
                                       return Column(
                                         children: <Widget>[
                                           Text(
-                                              'MAC not available. Enter manually if wanted'),
+                                              'Uuid not available. Enter manually if wanted'),
                                           TextFormField(
-                                              controller: _macController,
+                                              controller: _uuidController,
                                               decoration: const InputDecoration(
-                                                hintText: 'MAC',
+                                                hintText: 'Uuid',
                                               ),
                                               validator: (value) {
                                                 if (value.toString().isEmpty) {
@@ -140,37 +141,38 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                       } else {
                                         var candidateList = snapshot.data!;
                                         return Column(children: <Widget>[
-                                          Text('MAC'),
+                                          Text('Uuid'),
                                           // DropDown<Candidate>(
                                           //     items: candidateList,
                                           //     //                initialValue: selectedPerson,
-                                          //     hint: Text("Select MAC"),
+                                          //     hint: Text("Select Uuid"),
                                           //     initialValue: candidateList.first,
                                           //     onChanged: (Candidate c) {
-                                          //       print(c.mac);
+                                          //       print(c.uuid);
                                           //       setState(() {
-                                          //         _macController.text = c.mac;
+                                          //         _uuidController.text = c.uuid;
                                           //       });
-                                          //     })
+                                          //     }),
                                           DropdownButton<String>(
                                               value: _chosenValue,
-                                              hint: Text("Velg MAC fra liste"),
-                                              onChanged: (String? value) {
+                                              hint: Text("Velg Uuid fra liste"),
+                                              onChanged: (String? c) {
                                                 setState(() {
-                                                  _chosenValue = value!;
+                                                  _chosenValue = c!;
                                                 });
 
-                                                _macController.text =
+                                                _uuidController.text =
                                                     _chosenValue;
+                                                print(c);
                                               },
                                               items: candidateList
-                                                  .map((Candidate candidate) {
+                                                  .map((String candidate) {
                                                 return new DropdownMenuItem<
                                                     String>(
                                                   value:
-                                                      candidate.mac.toString(),
-                                                  child: new Text(
-                                                      "${candidate.mac} with rssi ${candidate.rssi}"),
+                                                      candidate,
+                                                  child: Text(
+                                                      "${candidate}"),
                                                 );
                                               }).toList())
                                         ]);

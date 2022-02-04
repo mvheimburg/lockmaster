@@ -46,20 +46,20 @@ class UserRepository(Repository):
             return entity
 
 
-    def add(self, name: str, mac: str = None, pin: int = None, end: datetime.datetime = None, access_level: int = 1, is_active: bool = True) -> UserOrm:
+    def add(self, name: str, uuid: str = None, pin: int = None, end: datetime.datetime = None, access_level: int = 1, is_active: bool = True) -> UserOrm:
         with self.session_factory() as session:
-            entity = UserOrm(name=name, mac=mac, pin=pin, end=end, access_level=access_level, is_active=is_active)
+            entity = UserOrm(name=name, uuid=uuid, pin=pin, end=end, access_level=access_level, is_active=is_active)
             session.add(entity)
             session.commit()
             session.refresh(entity)
             return entity
 
 
-    def edit(self, user_id: int, name: str, mac: str = None, pin: int = None, end: datetime.datetime = None, access_level: int = 1, is_active: bool = True) -> UserOrm:
+    def edit(self, user_id: int, name: str, uuid: str = None, pin: int = None, end: datetime.datetime = None, access_level: int = 1, is_active: bool = True) -> UserOrm:
         with self.session_factory() as session:
             entity = session.query(UserOrm).filter(UserOrm.id == user_id).first()
             entity.name = name
-            entity.mac = mac
+            entity.uuid = uuid
             entity.pin = pin
             entity.end = end
             entity.access_level = access_level
@@ -107,7 +107,7 @@ class UserIdNotFoundError(IdNotFoundError):
 
 
 class BeaconNotFoundError(NotFoundError):
-    entity_name: str = 'MAC'
+    entity_name: str = 'UUID'
 
 class PinNotFoundError(NotFoundError):
     entity_name: str = 'Pin'
