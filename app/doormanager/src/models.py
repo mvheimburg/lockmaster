@@ -49,55 +49,38 @@ class UserModel(BaseModel):
     access_level:int
 
 
-# class UuidAccessModel(BaseModel):
-#     uuid: str
-#     access_level: int
+class MqttTopics(BaseModel):
+    command: Optional[str]
+    state: Optional[str]
 
-    # def __str__(self):
-    #  return self.uuid
-
-
-# class BeaconListModel(BaseModel):
-#     candidates: List[BeaconModel]
 
 class AccessModel(BaseModel):
     name:Optional[str]
     access_level: int
-# PydanticUser = sqlalchemy_to_pydantic(UserOrm)
 
 
 class Door(BaseModel):
     name: str
-    command_topic: str
-    state_topic: str
     state: str = "Unknown"
-    # pin: int
+    topic: MqttTopics = MqttTopics()
     relay: gpiozero.OutputDevice
 
     class Config:
         arbitrary_types_allowed = True
 
-    # def __init__(self, name:str, command_topic: str, state_topic: str, pin: int):
-    #     # self.state = DoorState(name=name, pin=pin, command_topic=command_topic, state_topic=state_topic)
-    #     self.name=name
-    #     self.command_topic=command_topic
-    #     self.state_topic=state_topic
-
-
-    # def set_relay(self):
-    #     self.relay = gpiozero.OutputDevice(self.pin, active_high=False, initial_value=False)
-
-
     def startup(self):
         self.update_status()
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.topic.command=f"door/{self.name}/cmd"
+        self.topic.state=f"door/{self.name}/state"
 
     def update_status(self):
         if self.relay.value:
             self.state = STATUS_PAYLOAD.UNLOCKED
         else:
             self.state = STATUS_PAYLOAD.LOCKED
-
 
     def unlock(self):
         print(f"Unlocking door {self.name}")
@@ -123,11 +106,16 @@ class Door(BaseModel):
 
 class DoorDummy(BaseModel):
     name: str
-    command_topic: str
-    state_topic: str
     state: str = "Unknown"
-    pin: int
+    topic: MqttTopics = MqttTopics()
+    relay: int
 
+
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.topic.command=f"door/{self.name}/cmd"
+        self.topic.state=f"door/{self.name}/state"
 
 
     def startup(self):

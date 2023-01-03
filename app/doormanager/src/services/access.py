@@ -5,12 +5,12 @@ from threading import Thread, Lock
 from time import sleep
 import ujson as json
 
-import xmlrpc.client
+# import xmlrpc.client
 
 from repositories import UserRepository, BeaconNotFoundError, PinNotFoundError
 from models import AccessModel
 
-from api.api import presence_out_of_bounds, presence_detected
+from api.api import presence_detected
 from const import DIST_THRESHOLD, DOOR_ID
 
 class AccessService:

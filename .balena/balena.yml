@@ -1,0 +1,29 @@
+build-variables:
+  global:
+    - PROJECT_NAME=master
+    - DOMAIN=lvh.duckdns.org
+    - CERTRESOLVER=prod
+    - BUILD_TYPE=release
+    - POSTGRES_SERVER=lock_db
+    - POSTGRES_USER=lock
+    - POSTGRES_PASSWORD=lock
+    - POSTGRES_DB=lockmaster
+  services:
+    doormanager:
+      - VIRTUAL_ENV=venv
+      - MQTT_CLIENT_ID=doormanagerclient
+      - MQTT_HOST=192.168.1.2
+      - MQTT_PORT=1883
+      - MQTT_USERNAME=doormanager
+      - MQTT_PASSWORD=doormanager!
+      - DOORBELL_URL=http://192.168.1.100:80
+
+    traefik:
+      - IP_ALLOWLIST=192.168.1.0/24
+      - ACME_EMAIL=heimburg@gmail.com
+      - HOMEASSISTANT_IP=192.168.1.2
+      - HOMEASSISTANT_PORT=8123
+      - HOMEASSISTANT_SERVER=http://192.168.1.2:8123/
+      - LOCKMASTER_HOST=lvh.duckdns.org
+      - PROVIDER=duckdns
+      - DUCKDNS_TOKEN=d437b6c8-d9f9-44f3-9b55-34df3b35fb9e

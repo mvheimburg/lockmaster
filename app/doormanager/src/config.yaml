@@ -1,16 +1,10 @@
 doors:
-    Main:
+    main:
         pin: 19
-        command_topic: "door/1/cmd"
-        state_topic: "door/1/state"
-    Garage:
+    garage:
         pin: 26
-        command_topic: "door/2/cmd"
-        state_topic: "door/2/state"
-    Workshop:
+    workshop:
         pin: 20
-        command_topic: "door/3/cmd"
-        state_topic: "door/3/state"
 bell:
     command_topic: "bell/ring/toggle"
     command: "do"

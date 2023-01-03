@@ -17,6 +17,7 @@ build-variables:
     - MQTT_PORT=
     - MQTT_USERNAME=
     - MQTT_PASSWORD=
+    - DOORBELL_URL=
 
   traefik:
     - IP_ALLOWLIST=192.168.x.x/24

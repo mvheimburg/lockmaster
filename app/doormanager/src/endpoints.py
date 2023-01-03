@@ -1,10 +1,10 @@
 """Endpoints module."""
 
-from fastapi import APIRouter, Depends, Response, status, Form, Body
+from fastapi import APIRouter, WebSocket, Depends, Response, status, Form, Body
 from dependency_injector.wiring import inject, Provide
 
 from containers import Container
-from services import UserService, AccessService, BellService
+from services import UserService, AccessService, BellService, DoorService
 # from services import UserService
 from repositories import NotFoundError
 
@@ -160,3 +160,83 @@ async def delete_db(
 ):
     print('/delete_db/')
     return user_service.delete_db()
+
+
+@router.put('/unlock_door/')
+@inject
+async def put_unlock_door(
+    door_name: str=Body(...),
+    door_service: DoorService = Depends(Provide[Container.door_service]),
+):
+    print('/unlock_door/')
+    return door_service.unlock_door(door_name)
+
+
+@router.put('/lock_door/')
+@inject
+async def put_lock_door(
+    door_name: str=Body(...),
+    door_service: DoorService = Depends(Provide[Container.door_service]),
+):
+    print('/unlock_door/')
+    return door_service.lock_door(door_name)
+
+
+@router.put('/toggle_door/')
+@inject
+async def put_toggle_door(
+    door_name: str=Body(...),
+    door_service: DoorService = Depends(Provide[Container.door_service]),
+):
+    print('/toggle_door/')
+    return door_service.toggle_door(door_name)
+
+
+@router.get('/door_state/{door_name}/')
+@inject
+async def get_door_state(
+    door_name: str,
+    door_service: DoorService = Depends(Provide[Container.door_service]),
+):
+    print('/unlock_door/')
+    return door_service.get_door_state(door_name)
+
+
+
+# @router.websocket_route('/ws/route_test/')
+# @inject
+# async def websocket_door_state(
+#     websocket: WebSocket,
+# ):
+#     await websocket.accept()
+#     c = 0
+#     while True:
+#         c+=1
+#         await websocket.send_text(f"Message text was: {c}")
+
+@router.websocket('/ws/door_state/{door_name}/')
+@inject
+async def ws_test(
+    websocket: WebSocket,
+    door_name: str,
+    door_service: DoorService = Depends(Provide[Container.door_service]),
+):
+    await websocket.accept()
+    x = door_service.get_door_state(door_name)
+    websocket.send(x)
+    while True:
+        x = await door_service.async_get_door_state(door_name)
+        websocket.send(x)
+
+
+
+@router.websocket('/ws/test/')
+@inject
+async def ws_test(
+    websocket: WebSocket,
+):
+    await websocket.accept()
+    c = 0
+    while True:
+        c+=1
+        await websocket.send_text(f"Message text was: {c}")

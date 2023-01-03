@@ -7,7 +7,7 @@ fastapi
 fastapi-mqtt
 fastapi-utils
 gunicorn
-uvicorn
+uvicorn[standard]
 # PyDispatcher
 pydantic
 # psycopg2

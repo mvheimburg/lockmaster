@@ -37,9 +37,9 @@ class DoorService:
         for door, cfg in  doors_cfg.items():
             print(f"new_door: {door}")
             if build_type == 'release':
-                new_door = Door(name=door, command_topic=cfg['command_topic'], state_topic=cfg['state_topic'], relay=gpiozero.OutputDevice(cfg['pin'], active_high=False, initial_value=False))
+                new_door = Door(name=door, relay=gpiozero.OutputDevice(cfg['pin'], active_high=False, initial_value=False))
             else:
-                new_door = Door(name=door, command_topic=cfg['command_topic'], state_topic=cfg['state_topic'], pin=cfg['pin'])
+                new_door = Door(name=door, pin=cfg['pin'])
             # new_door.set_relay()
             self.doors.append(new_door)
 
@@ -58,18 +58,18 @@ class DoorService:
     def subscribe(self):
         print(f"subscribing to topics!!!!")
         for door in self.doors:
-            print(f"subscribing to topic: {door.command_topic}")
-            self.mqttc.subscribe(door.command_topic, qos=0)
+            print(f"subscribing to topic: {door.topic.command}")
+            self.mqttc.subscribe(door.topic.command, qos=0)
 
     def publish_status(self):
         for door in self.doors:
             if door.state != "Unknown":
-                self.mqttc.publish(door.state_topic, payload=door.state)
+                self.mqttc.publish(door.topic.state, payload=door.state)
     
     
     def mqtt_on_message(self, topic, payload):
         for door in self.doors:
-            if topic == door.command_topic:
+            if topic == door.topic.command:
                 print("Doormanager message: ", topic, payload) 
                 if payload == COMMAND_PAYLOAD.LOCK:
                     print(f"Doormanager message: Locking door {door}") 
@@ -80,6 +80,38 @@ class DoorService:
 
         self.publish_status()
 
+
+    def toggle_door(self, door_name:str):
+        for door in self.doors:
+            if door.name == door_name:
+                door.toggle_door()
+                return door.state
+
+
+    def unlock_door(self, door_name:str):
+        for door in self.doors:
+            if door.name == door_name:
+                door.unlock()
+                return door.state
+
+    def lock_door(self, door_name:str):
+        for door in self.doors:
+            if door.name == door_name:
+                door.lock()
+                return door.state
+    
+
+    def get_door_state(self, door_name:str):
+        for door in self.doors:
+            if door.name == door_name:
+                return door.state
+                
+    
+
+    async def async_get_door_state(self, door_name:str):
+        for door in self.doors:
+            if door.name == door_name:
+                return door.state
 
     def publish_status_cyclic(self):
         if self.mqttc is not None:
