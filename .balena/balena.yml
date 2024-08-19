@@ -8,16 +8,19 @@ build-variables:
     - POSTGRES_USER=lock
     - POSTGRES_PASSWORD=lock
     - POSTGRES_DB=lockmaster
+    - MQTT_HOST=192.168.1.2
+    - MQTT_PORT=1883
   services:
     doormanager:
       - VIRTUAL_ENV=venv
-      - MQTT_CLIENT_ID=doormanagerclient
-      - MQTT_HOST=192.168.1.2
-      - MQTT_PORT=1883
+      - MQTT_CLIENT_ID=doormanager
       - MQTT_USERNAME=doormanager
       - MQTT_PASSWORD=doormanager!
       - DOORBELL_URL=http://192.168.1.100:80
-
+    doorbell:
+      - MQTT_CLIENT_ID=doorbell
+      - MQTT_USERNAME=doorbell
+      - MQTT_PASSWORD=doorbell!
     traefik:
       - IP_ALLOWLIST=192.168.1.0/24
       - ACME_EMAIL=heimburg@gmail.com

@@ -12,34 +12,34 @@ services:
       - 443:443/tcp
       - 8081:8080/tcp
     labels:
-      - io.balena.features.balena-socket=true
+      io.balena.features.balena-socket: 'true'
 
-  doorcontrol:
-    build:
-      context: app/web
-      dockerfile: Dockerfile.doorcontrol
-    # expose:
-    #   - 3000
-    environment:
-      DOORMANAGER_HOST: doormanager
-      PORT: 3000
-    command: npm start
-    depends_on: 
-      - doormanager
+  # doorcontrol:
+  #   build:
+  #     context: app/web
+  #     dockerfile: Dockerfile.doorcontrol
+  #   # expose:
+  #   #   - 3000
+  #   environment:
+  #     DOORMANAGER_HOST: doormanager
+  #     PORT: 3000
+  #   command: npm start
+  #   depends_on: 
+  #     - doormanager
 
   
-  doormonitor:
-    build:
-      context: app/web
-      dockerfile: Dockerfile.doormonitor
-    # expose:
-    #   - 3000
-    environment:
-      DOORMANAGER_HOST: doormanager
-      PORT: 3000
-    command: npm start
-    depends_on: 
-      - doormanager
+  # doormonitor:
+  #   build:
+  #     context: app/web
+  #     dockerfile: Dockerfile.doormonitor
+  #   # expose:
+  #   #   - 3000
+  #   environment:
+  #     DOORMANAGER_HOST: doormanager
+  #     PORT: 3000
+  #   command: npm start
+  #   depends_on: 
+  #     - doormanager
 
   doormanager:
     privileged: true
@@ -55,8 +55,46 @@ services:
       - lock_db
       - traefik
     command: python -m uvicorn main:app --host 0.0.0.0 --port 5555
-    # command: python -m gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker
+    labels:
+      traefik.enable: 'true'
+      # traefik.http.routers.doormanager-secure.entrypoints: websecure
+      # traefik.http.routers.doormanager-secure.rule: PathPrefix(`/doormanager`)
+      # traefik.http.routers.doormanager-secure.middlewares: doormanager-strip
+      # traefik.http.routers.doormanager-secure.tls: true
+      # traefik.http.routers.doormanager-secure.tls.certresolver: ${CERTRESOLVER}
+      # traefik.http.routers.doormanager-secure.service: doormanager
+      traefik.http.routers.doormanager.entrypoints: 'web'
+      traefik.http.routers.doormanager.rule: PathPrefix(`/doormanager`)
+      traefik.http.routers.doormanager.middlewares: 'doormanager-strip'
+      traefik.http.routers.doormanager.service: 'doormanager'
+      traefik.http.middlewares.doormanager-strip.stripprefix.prefixes: '/doormanager'
+      traefik.http.services.doormanager.loadbalancer.server.port: 5555
+
+  doorbell:
+    build: 
+      context: doorbell
+      dockerfile: Dockerfile
+    privileged: true
+    labels:
+      io.balena.features.dbus: 1 
+      traefik.enable: 'true'
+      traefik.http.routers.doorbell.entrypoints: 'web'
+      traefik.http.routers.doorbell.rule: PathPrefix(`/doorbell`)
+      traefik.http.routers.doorbell.middlewares: 'doorbell-strip'
+      # traefik.http.routers.doorbell.tls: true
+      # traefik.http.routers.doorbell.tls.certresolver: ${CERTRESOLVER}
+      traefik.http.middlewares.doorbell-strip.stripprefix.prefixes: '/doorbell'
+      traefik.http.services.doorbell.loadbalancer.server.port: 5556
+    restart: always
+    ports:
+      - 5556:5556
+    depends_on: 
+      - lock_db
+      - traefik
     
+    # volumes:
+    #   - 'pulse:/run/pulse'
+
     
   unifi-controller:
     build:
@@ -78,6 +116,13 @@ services:
       - 8880:8880 #optional
       - 6789:6789 #optional
       - 5514:5514/udp #optional
+    # labels:
+    #   traefik.enable: 'true'
+    #   traefik.http.routers.unifi-secure.entrypoints: websecure
+    #   traefik.http.routers.unifi-secure.rule: Host(`unifi.${DOMAIN}`)
+    #   traefik.http.routers.unifi-secure.tls: 'true'
+    #   traefik.http.routers.unifi-secure.tls.certresolver: ${CERTRESOLVER}
+    #   traefik.http.services.doorbell.loadbalancer.server.port: 8080
 
 
   lock_db:

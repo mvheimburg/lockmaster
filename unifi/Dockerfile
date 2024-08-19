@@ -1,4 +1,7 @@
 # FROM linuxserver/unifi-controller:latest
+ARG DOMAIN
+ARG CERTRESOLVER
+
 FROM jacobalberty/unifi:latest
 
 ARG DOMAIN

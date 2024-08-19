@@ -1,0 +1,15 @@
+bell:
+    command: "bell/ring/toggle"
+    state: ""
+
+
+garage:
+    command: "garage/gate/cmd"
+    state: "garage/gate/state"
+
+mode:
+    command: "house/mode/cmd"
+    state: "house/mode/state"
+state:
+    command: "house/state/cmd"
+    state: "house/state/state"

@@ -71,19 +71,19 @@ WORKDIR /app
 
 COPY src/ .
 
-LABEL   traefik.enable="true" \
-        traefik.http.routers.doormanager-secure.entrypoints="websecure" \
-        traefik.http.routers.doormanager-secure.rule="Host(`doorcontrol.${DOMAIN}`) && PathPrefix(`/doormanager`)" \
-        traefik.http.routers.doormanager-secure.middlewares="doormanager-strip" \
-        traefik.http.routers.doormanager-secure.tls="true" \
-        traefik.http.routers.doormanager-secure.tls.certresolver=${CERTRESOLVER} \
-        traefik.http.routers.doormanager-secure.service="doormanager"\
-        traefik.http.routers.doormanager.entrypoints="web" \
-        traefik.http.routers.doormanager.rule="PathPrefix(`/doormanager`)" \
-        traefik.http.routers.doormanager.middlewares="doormanager-strip" \
-        traefik.http.routers.doormanager.service="doormanager"\
-        traefik.http.middlewares.doormanager-strip.stripprefix.prefixes="/doormanager" \
-        traefik.http.services.doormanager.loadbalancer.server.port="5555"
+# LABEL   traefik.enable="true" \
+#         traefik.http.routers.doormanager-secure.entrypoints="websecure" \
+#         traefik.http.routers.doormanager-secure.rule="PathPrefix(`/doormanager`)" \
+#         traefik.http.routers.doormanager-secure.middlewares="doormanager-strip" \
+#         traefik.http.routers.doormanager-secure.tls="true" \
+#         traefik.http.routers.doormanager-secure.tls.certresolver=${CERTRESOLVER} \
+#         traefik.http.routers.doormanager-secure.service="doormanager"\
+#         traefik.http.routers.doormanager.entrypoints="web" \
+#         traefik.http.routers.doormanager.rule="PathPrefix(`/doormanager`)" \
+#         traefik.http.routers.doormanager.middlewares="doormanager-strip" \
+#         traefik.http.routers.doormanager.service="doormanager"\
+#         traefik.http.middlewares.doormanager-strip.stripprefix.prefixes="/doormanager" \
+#         traefik.http.services.doormanager.loadbalancer.server.port="5555"
 
 # RUN echo 'alias run="gunicorn main:app -b 0.0.0.0:5555 -k uvicorn.workers.UvicornWorker"' >> ~/.bashrc
 # ENV UDEV=1
