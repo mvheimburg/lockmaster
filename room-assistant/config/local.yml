@@ -26,7 +26,7 @@ bluetoothLowEnergy:
   # maxDistance: 5
   # maxDistance: 5
 homeAssistant:
-  mqttUrl: mqtt://192.168.1.2:1883
+  mqttUrl: mqtt://192.168.1.5:1883
   mqttOptions:
     username: tekniskprecense
     password: tekniskprecense!
